@@ -6,9 +6,12 @@ maxCommands: 1
 
 inGame:
   story: |
-    Сделал git reset --hard HEAD~10, ошибся веткой. Других операций не было.
-    10 коммитов исчезли.
-  goal: "Вернуть ветку одной командой."
+    Дарина рядом говорила про HEAD~1, ты машинально написал HEAD~10 — опечатка на одну цифру.
+    Хотел откатить один экспериментальный коммит, откатил десять.
+    Других операций с тех пор не было — только этот один reset.
+    maxCommands: 1 — нужно вернуться одной командой, без reflog.
+  goal: "Вернуть ветку в состояние до reset одной командой."
+
   bank:
     commands: [reset]
     flags: ["--hard"]
@@ -30,20 +33,35 @@ inGame:
       sequence:
         - step: "git reset --hard HEAD@{1}"
 
+  forbiddenCommands: []
+
   pointsModifiers:
     bonuses:
       - condition: { type: usesArg, arg: "ORIG_HEAD" }
         points: 2
-        reason: "ORIG_HEAD — минимальный путь"
+        reason: "ORIG_HEAD — самый прямой путь"
     penalties: []
 
   hints:
-    - "ORIG_HEAD автоматически выставляется reset/merge/rebase."
+    - "ORIG_HEAD автоматически выставляется перед reset, merge, rebase."
 
 knowledge:
   explanation: |
-    Внутри maxCommands=1 единственно реальный путь — ORIG_HEAD или HEAD@{1}.
-  solutionsCommentary: []
+    При maxCommands=1 единственный путь — знать ORIG_HEAD или HEAD@{1}.
+    ORIG_HEAD выставляется reset/merge/rebase перед опасной операцией.
+    HEAD@{1} — предыдущая позиция HEAD в reflog.
+  solutionsCommentary:
+    - solutionLabel: "reset --hard ORIG_HEAD"
+      commentary: |
+        ORIG_HEAD — специальный ref, который git выставляет перед reset, merge, rebase.
+        Пока не было других опасных операций, он точно указывает на коммит до сброса.
+        Самый прямой путь: одна команда, никакого reflog.
+    - solutionLabel: "reset --hard HEAD@{1}"
+      commentary: |
+        HEAD@{1} — предыдущая позиция HEAD в reflog. Работает так же как ORIG_HEAD в данном
+        случае, но является записью reflog, а не специальным ref. Чуть менее явный, зато
+        работает и в ситуациях когда ORIG_HEAD уже перезаписан другой операцией.
   aliases: []
   relatedKnowledge: [automatic-refs, orig-head-when-set, head-history-syntax]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-reset(1)", url: "https://git-scm.com/docs/git-reset" }

@@ -6,8 +6,12 @@ maxCommands: 6
 
 inGame:
   story: |
-    В layout.css два несвязанных изменения — grid в хедере и z-index у модалок.
-  goal: "Закоммитить раздельно: два коммита с правильным разделением."
+    Пока правил layout.css, случайно затронул два разных места: grid-раскладку в хедере
+    и z-index у модалок. Изменения несвязанные, коммитить их вместе — плохая практика.
+    Рома попросил в PR два отдельных коммита с понятными сообщениями.
+    Оба изменения в одном файле — придётся разбивать.
+  goal: "Создать два раздельных коммита из одного файла layout.css."
+
   bank:
     commands: [add, commit]
     flags: ["-p", "-m"]
@@ -23,20 +27,33 @@ inGame:
 
   validSolutions:
     - kind: ideal
-      label: "add -p + commit ×2"
+      label: "add -p + commit x2"
       sequence:
         - step: "git add -p layout.css"
         - step: 'git commit -m "fix: header grid"'
         - step: "git add -p layout.css"
         - step: 'git commit -m "refactor: modal z-index"'
 
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
-    - "add -p даёт интерактивный выбор hunk'ов."
+    - "add -p даёт интерактивный выбор отдельных hunk'ов внутри файла."
 
 knowledge:
   explanation: |
-    add -p позволяет stage'ить отдельные hunks из файла.
-  solutionsCommentary: []
+    add -p запускает интерактивный режим выбора hunks: y/n/s/e для каждого куска.
+    Позволяет закоммитить только часть изменений файла.
+  solutionsCommentary:
+    - solutionLabel: "add -p + commit x2"
+      commentary: |
+        add -p открывает каждый hunk поочерёдно — выбираешь y (добавить) или n (пропустить).
+        Первым проходом берёшь только grid-правки, коммитишь. Вторым — z-index правки.
+        Самый контролируемый способ разбить изменения одного файла на несколько коммитов.
   aliases: []
   relatedKnowledge: [add-patch-mechanics, stash-patch]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-add(1)", url: "https://git-scm.com/docs/git-add" }

@@ -6,13 +6,17 @@ maxCommands: 5
 
 inGame:
   story: |
-    По привычке закоммитил правку tokens.css прямо в main локально. Ещё не пушил.
-    Марк увидит — убьёт.
+    По привычке написал git commit прямо в main, забыв переключиться на свою ветку.
+    В коммите — правка tokens.css, которая ни разу не должна быть в main.
+    Елена смотрит git log перед каждым PR-аппрувом, и это она точно заметит.
+    Хорошо, что ещё не пушил.
   goal: "Перенести коммит в новую ветку feature/tokens, main оставить чистой."
+
   initialStateDisplay:
     branchLabel: "main"
     commits:
-      - { hash: c1, message: "tokens.css tweak" }
+      - { hash: c0, message: "chore: update deps" }
+      - { hash: c1, message: "fix tokens.css" }
     workingTree: "clean"
 
   bank:
@@ -64,11 +68,12 @@ knowledge:
   solutionsCommentary:
     - solutionLabel: "branch + reset --hard + switch"
       commentary: |
-        Минимальный путь: branch фиксирует HEAD в новой ветке, reset --hard
-        безопасно сдвигает main назад.
+        Минимальный путь: branch фиксирует HEAD в новой ветке, reset --hard безопасно
+        сдвигает main назад. reset --soft здесь ловушка — оставит изменения в индексе main.
     - solutionLabel: "checkout -b + back to main + reset"
       commentary: |
-        Дольше, но классика. checkout -b сразу переключает, потом возвращаемся.
+        Классика: checkout -b сразу переключает на новую ветку, потом возвращаемся в main
+        и откатываем. Длиннее, но понятнее — каждый шаг очевиден.
   aliases: []
   relatedKnowledge: [reset-soft-mixed-hard, branch-pointer-semantics]
   externalLinks:

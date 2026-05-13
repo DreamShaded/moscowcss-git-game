@@ -6,9 +6,13 @@ maxCommands: 4
 
 inGame:
   story: |
-    В main запушен срочный фикс :focus-visible (hash a1b2c3d).
-    В feature/forms он нужен сейчас. Мержить main целиком нельзя.
-  goal: "Перенести один коммит из main в текущую ветку, разрешить конфликт."
+    Рома только что запушил в main срочный фикс :focus-visible (хэш a1b2c3d) —
+    кнопки в Safari перестали реагировать на клавиатуру, баг критичный.
+    Ты сидишь в feature/forms, где этот компонент тоже используется.
+    Мержить main целиком нельзя — там Ромины незаконченные правки компоновки,
+    которые сломают твою верстку. Нужен только этот один коммит.
+  goal: "Перенести коммит a1b2c3d из main в текущую ветку, разрешить конфликт."
+
   bank:
     commands: [cherry-pick, add, merge, rebase, commit]
     flags: ["--continue", "--abort", "-n", "-x", "-m"]
@@ -53,7 +57,7 @@ inGame:
     bonuses:
       - condition: { type: usesFlag, flag: "-x" }
         points: 1
-        reason: "-x записывает исходный hash в сообщение"
+        reason: "-x записывает исходный hash в сообщение коммита"
     penalties: []
 
   hints:
@@ -62,8 +66,21 @@ inGame:
 knowledge:
   explanation: |
     cherry-pick переносит конкретный коммит в текущую ветку. Флаг -x добавляет в сообщение
-    ссылку на оригинальный коммит — полезно для аудита.
-  solutionsCommentary: []
+    ссылку на оригинальный коммит — полезно для аудита: сразу видно откуда взято.
+  solutionsCommentary:
+    - solutionLabel: "cherry-pick -x + resolve + continue"
+      commentary: |
+        -x дописывает в конец сообщения "(cherry picked from commit a1b2c3d)" —
+        удобно когда потом разбираешься в истории и хочешь понять откуда этот коммит.
+        Чуть длиннее флага, зато аудит-след бесплатный.
+    - solutionLabel: "cherry-pick + continue"
+      commentary: |
+        Стандартный cherry-pick без -x. Конфликт разрешаешь вручную, потом --continue
+        завершает операцию. Рабочий вариант, просто без ссылки на источник.
+    - solutionLabel: "cherry-pick -n + ручной commit"
+      commentary: |
+        -n (--no-commit) применяет изменения без авто-коммита. Даёт контроль над сообщением,
+        но требует явного commit в конце. Полезно когда хочешь отредактировать сообщение.
   aliases: []
   relatedKnowledge: [cherry-pick-ranges, cherry-pick-merge-commits]
   externalLinks:

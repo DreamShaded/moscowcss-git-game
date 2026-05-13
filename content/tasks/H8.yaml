@@ -6,9 +6,20 @@ maxCommands: 4
 
 inGame:
   story: |
-    feature/forms по ошибке ответвилась от feature/buttons вместо main.
-    Последние 4 коммита — твои, чистые.
-  goal: "feature/forms начинается от main и содержит только твои 4 коммита."
+    feature/forms по ошибке ответвилась от feature/buttons вместо main — наверное
+    переключился не туда перед git switch -c. Последние 4 коммита в feature/forms
+    твои, чистые — они никак не зависят от feature/buttons. Алёна говорит:
+    "Используй --onto, это ровно для такого сделано." Нужно перенести только твои
+    4 коммита поверх main, без коммитов из feature/buttons.
+  goal: "Перебазировать feature/forms поверх main, исключив коммиты feature/buttons."
+
+  initialStateDisplay:
+    branches:
+      - { name: "main", commits: ["A", "B"] }
+      - { name: "feature/buttons", commits: ["A", "B", "C", "D"] }
+      - { name: "feature/forms", commits: ["A", "B", "C", "D", "E", "F", "G", "H"] }
+    note: "E-H — твои коммиты, C-D — из feature/buttons"
+
   bank:
     commands: [rebase]
     flags: ["--onto"]
@@ -25,20 +36,31 @@ inGame:
       sequence:
         - step: "git rebase --onto main feature/buttons feature/forms"
 
+  forbiddenCommands: []
+
   pointsModifiers:
     bonuses:
       - condition: { type: usesFlag, flag: "--onto" }
         points: 2
-        reason: "--onto — элегантный перенос диапазона"
+        reason: "--onto — точный перенос диапазона коммитов"
     penalties: []
 
   hints:
-    - "--onto <new> <old> <branch>: перенести коммиты с <old>..<branch> поверх <new>."
+    - "--onto <new-base> <old-base> <branch>: перенести коммиты с old-base..branch поверх new-base."
 
 knowledge:
   explanation: |
     rebase --onto переносит произвольный диапазон поверх произвольной базы.
-  solutionsCommentary: []
+    Синтаксис: --onto <new> <exclude-upto> <branch>. Коммиты после <exclude-upto> до <branch>
+    перекладываются поверх <new>.
+  solutionsCommentary:
+    - solutionLabel: "rebase --onto"
+      commentary: |
+        --onto main feature/buttons feature/forms говорит: "возьми коммиты feature/forms
+        которые идут после feature/buttons (то есть только твои E-H), и переложи их поверх main".
+        Коммиты C-D из feature/buttons не попадают. Это ровно тот случай для которого --onto
+        и придуман — перенос поддиапазона без ручного cherry-pick.
   aliases: []
   relatedKnowledge: [rebase-onto-deep, cherry-pick-range]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-rebase(1)", url: "https://git-scm.com/docs/git-rebase" }

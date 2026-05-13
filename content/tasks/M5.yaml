@@ -6,9 +6,17 @@ maxCommands: 4
 
 inGame:
   story: |
-    Соня сделала git reset --hard HEAD~5, потеряла 5 коммитов работы над модалкой.
-    Не пушила. Плачет.
-  goal: "Восстановить ветку на потерянный коммит."
+    Дарина хотела откатить один экспериментальный коммит в ветке feature/modal,
+    но написала git reset --hard HEAD~5 вместо HEAD~1. Пять коммитов работы над
+    модалкой исчезли. Не пушила — на remote их нет. Пришла к тебе за помощью.
+  goal: "Восстановить ветку на коммит до неудачного reset."
+
+  initialStateDisplay:
+    branchLabel: "feature/modal"
+    commits:
+      - { hash: c0, message: "feat: modal base" }
+    workingTree: "clean (5 коммитов потеряны)"
+
   bank:
     commands: [reflog, reset, branch]
     flags: ["--hard"]
@@ -47,18 +55,33 @@ inGame:
     bonuses:
       - condition: { type: usesArg, arg: "ORIG_HEAD" }
         points: 1
-        reason: "ORIG_HEAD — короткий путь"
+        reason: "ORIG_HEAD — прямой путь без reflog"
     penalties: []
 
   hints:
-    - "ORIG_HEAD автоматически выставляется перед опасными операциями."
-    - "reflog показывает все позиции HEAD."
+    - "ORIG_HEAD автоматически выставляется перед опасными операциями вроде reset."
+    - "reflog показывает все позиции HEAD — даже после reset --hard."
 
 knowledge:
   explanation: |
-    reset --hard выставляет ORIG_HEAD на предыдущий HEAD. reflog хранит историю позиций.
-  solutionsCommentary: []
+    reset --hard выставляет ORIG_HEAD на предыдущий HEAD. reflog хранит историю позиций HEAD
+    с временными метками — коммиты живут в reflog до gc/expire (90 дней по умолчанию).
+  solutionsCommentary:
+    - solutionLabel: "reset --hard ORIG_HEAD"
+      commentary: |
+        Самый короткий путь: ORIG_HEAD автоматически выставляется перед reset, merge, rebase.
+        Если после reset больше ничего не делали — ORIG_HEAD указывает именно туда, куда нужно.
+    - solutionLabel: "reflog + reset"
+      commentary: |
+        Универсальный метод: reflog показывает всю историю позиций HEAD с хэшами.
+        Находишь нужный коммит по сообщению или времени, делаешь reset --hard на него.
+        Работает даже когда ORIG_HEAD уже перезаписан другой операцией.
+    - solutionLabel: "safer recovery branch"
+      commentary: |
+        Осторожный вариант: сначала создаёшь ветку на нужном коммите, потом reset.
+        Полезно когда не уверен в хэше — ветка будет как страховочная сетка.
   aliases: []
   relatedKnowledge: [reflog-mechanics, orig-head-when-set, gc-and-pruning]
   externalLinks:
     - { title: "git-reflog(1)", url: "https://git-scm.com/docs/git-reflog" }
+    - { title: "git-reset(1)", url: "https://git-scm.com/docs/git-reset" }

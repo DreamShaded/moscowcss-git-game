@@ -6,8 +6,11 @@ maxCommands: 3
 
 inGame:
   story: |
-    Закоммитил "fix buton hover state". Не пушил. Марк всё ещё смотрит.
+    Закоммитил правку ховера в кнопке и написал "fix buton hover state" — без второй t.
+    Ещё не пушил, так что исправить реально. Елена всё равно прочитает лог перед аппрувом,
+    и такое она точно прокомментирует.
   goal: "Исправить сообщение последнего коммита."
+
   bank:
     commands: [commit, rebase, reset]
     flags: ["--amend", "--soft", "-i", "-m"]
@@ -31,15 +34,27 @@ inGame:
         - step: 'git commit -m "fix button hover state"'
 
   forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
     - "Есть команда специально для исправления последнего коммита."
 
 knowledge:
   explanation: |
-    git commit --amend заменяет HEAD-коммит. После push требует --force-with-lease.
+    git commit --amend заменяет HEAD-коммит. Если коммит уже запушен — после amend нужен
+    --force-with-lease. Тут не пушили, так что всё чисто.
   solutionsCommentary:
     - solutionLabel: "amend одной командой"
-      commentary: "Самый короткий путь."
+      commentary: |
+        Самый короткий путь: --amend заменяет последний коммит новым. С -m не нужно
+        открывать редактор — просто передаёшь исправленное сообщение прямо в команде.
+    - solutionLabel: "reset --soft + новый коммит"
+      commentary: |
+        Длиннее, но понятнее: reset --soft откатывает коммит, оставляя изменения в индексе,
+        затем делаешь новый коммит с правильным сообщением. Вариант для тех, кто не знает --amend.
   aliases: []
   relatedKnowledge: [amend-after-push, commit-fixup-autosquash]
   externalLinks:

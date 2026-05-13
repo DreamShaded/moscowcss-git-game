@@ -14,11 +14,13 @@ export interface ValidSolution {
 
 export interface Modifier {
   condition: {
-    type: 'usesCommand' | 'usesFlag' | 'usesArg' | 'avoidsCommand' | 'lengthAtMost';
+    type: 'usesCommand' | 'usesFlag' | 'usesArg' | 'usesAnyOf' | 'avoidsCommand' | 'sequenceLengthAtMost' | 'matchesSolutionKind';
     command?: string;
     flag?: string;
     arg?: string;
+    commands?: string[];
     length?: number;
+    kind?: SolutionKind;
   };
   points: number;
   reason: string;

@@ -6,46 +6,73 @@ maxCommands: 8
 
 inGame:
   story: |
-    refactor/css-architecture живёт месяц. Каждую неделю мержишь main,
-    и каждый раз одни и те же 12 конфликтов в theme.css.
-  goal: "Настроить rerere, сделать первый merge с запоминанием."
+    Ветка refactor/css-architecture живёт уже месяц. Каждую неделю Лера переименовывает
+    токены в theme.css, и при очередном merge main в твою ветку вспыхивают одни и те же
+    12 конфликтов — ты их уже решал три раза подряд. Алёна подсказала: есть механизм,
+    который запоминает как ты решил конфликт и применяет автоматически в следующий раз.
+  goal: "Включить rerere, сделать merge main с запоминанием разрешения конфликтов."
+
   bank:
     commands: [config, merge, add, commit]
-    flags: ["--global", "rerere.enabled", "true"]
-    args: ["theme.css", "main"]
+    flags: ["--global"]
+    args: ["rerere.enabled", "true", "theme.css", "main"]
     decoys:
       - "git config merge.tool"
       - "git merge -X ours"
       - "git merge -X theirs"
     prebuilt:
       - "git config --global rerere.enabled true"
+      - "git config rerere.enabled true"
       - "git merge main"
       - "git add theme.css"
       - "git commit"
 
   validSolutions:
     - kind: ideal
-      label: "config + merge + add + commit"
+      label: "config --global + merge + add + commit"
       sequence:
         - step: "git config --global rerere.enabled true"
         - step: "git merge main"
         - step: "git add theme.css"
         - step: "git commit"
+    - kind: standard
+      label: "config per-repo + merge + add + commit"
+      sequence:
+        - step: "git config rerere.enabled true"
+        - step: "git merge main"
+        - step: "git add theme.css"
+        - step: "git commit"
+
+  forbiddenCommands: []
 
   pointsModifiers:
     bonuses:
       - condition: { type: usesFlag, flag: "--global" }
         points: 1
-        reason: "глобально — для всех репо"
+        reason: "--global включает rerere для всех репозиториев"
     penalties: []
 
   hints:
-    - "rerere = REuse REcorded REsolution."
+    - "rerere = REuse REcorded REsolution. Нужно сначала включить в конфиге."
+    - "--global включает для всех репо, без него — только для текущего."
 
 knowledge:
   explanation: |
-    rerere запоминает resolved-конфликты и применяет автоматически при повторе.
-  solutionsCommentary: []
+    rerere запоминает как ты разрешил конфликт и применяет автоматически при повторе.
+    Хранит решения в .git/rr-cache/. --global включает для всех репо, без флага — только текущее.
+  solutionsCommentary:
+    - solutionLabel: "config --global + merge + add + commit"
+      commentary: |
+        --global включает rerere для всех твоих репо сразу — один раз настроил и забыл.
+        После первого merge с разрешением конфликтов rerere запомнит решение. При следующем
+        merge тех же конфликтов применит автоматически. Бонус за --global: полезнее per-repo.
+    - solutionLabel: "config per-repo + merge + add + commit"
+      commentary: |
+        Без --global rerere включается только для текущего репо. Логично когда не хочешь
+        менять глобальный конфиг или нужно изолировать настройку. Работает так же, просто
+        нужно повторить для каждого нового репо где возникнут повторяющиеся конфликты.
   aliases: []
   relatedKnowledge: [rerere-internals, rerere-forget]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-rerere(1)", url: "https://git-scm.com/docs/git-rerere" }
+    - { title: "git-config(1)", url: "https://git-scm.com/docs/git-config" }

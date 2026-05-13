@@ -6,8 +6,12 @@ maxCommands: 3
 
 inGame:
   story: |
-    Начал git merge main, 30 конфликтов в CSS, rebase был бы чище.
-  goal: "Прервать merge, сделать rebase."
+    Решил подтянуть main в свою ветку feature/grid через merge — привычка.
+    Открылось 30 конфликтов в CSS-файлах сразу, всё стало красным. Алёна
+    посмотрела и говорит: "Тут rebase чище будет, история линейнее." Нужно
+    прервать текущий merge и сделать rebase вместо него.
+  goal: "Прервать незавершённый merge и переключиться на rebase main."
+
   bank:
     commands: [merge, rebase, reset]
     flags: ["--abort", "--hard"]
@@ -32,21 +36,33 @@ inGame:
         - step: "git reset --hard HEAD"
         - step: "git rebase main"
 
+  forbiddenCommands: []
+
   pointsModifiers:
     bonuses:
       - condition: { type: usesFlag, flag: "--abort" }
         points: 1
-        reason: "merge --abort — корректный способ"
+        reason: "merge --abort корректно подчищает merge-state"
     penalties: []
 
-  forbiddenCommands: []
   hints:
-    - "merge --abort откатывает и очищает state-файлы."
+    - "merge --abort откатывает merge и очищает state-файлы."
 
 knowledge:
   explanation: |
-    Во время merge git хранит MERGE_HEAD и MERGE_MSG. merge --abort их подчищает.
-  solutionsCommentary: []
+    Во время merge git создаёт MERGE_HEAD и MERGE_MSG в .git/. merge --abort их подчищает
+    и возвращает к pre-merge состоянию. reset --hard тоже работает, но грубее.
+  solutionsCommentary:
+    - solutionLabel: "merge --abort + rebase"
+      commentary: |
+        Правильный способ: --abort корректно откатывает merge-состояние, очищает
+        MERGE_HEAD и MERGE_MSG. Потом rebase main даёт линейную историю без merge-коммита.
+    - solutionLabel: "reset + rebase"
+      commentary: |
+        reset --hard HEAD тоже работает — откатывает worktree к pre-merge состоянию.
+        Менее явный чем --abort, но результат тот же. После него rebase main как обычно.
   aliases: []
   relatedKnowledge: [merge-state-files, abort-vs-reset]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-merge(1)", url: "https://git-scm.com/docs/git-merge" }
+    - { title: "git-rebase(1)", url: "https://git-scm.com/docs/git-rebase" }

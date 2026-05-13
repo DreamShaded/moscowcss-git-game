@@ -82,11 +82,13 @@
           "type": "object",
           "required": ["type"],
           "properties": {
-            "type": { "enum": ["usesCommand", "usesFlag", "usesArg", "avoidsCommand", "lengthAtMost"] },
+            "type": { "enum": ["usesCommand", "usesFlag", "usesArg", "usesAnyOf", "avoidsCommand", "sequenceLengthAtMost", "matchesSolutionKind"] },
             "command": { "type": "string" },
             "flag": { "type": "string" },
             "arg": { "type": "string" },
-            "length": { "type": "integer" }
+            "commands": { "type": "array", "items": { "type": "string" } },
+            "length": { "type": "integer" },
+            "kind": { "enum": ["ideal", "standard", "long"] }
           }
         },
         "points": { "type": "integer" },

@@ -6,9 +6,12 @@ maxCommands: 3
 
 inGame:
   story: |
-    Неделю сидишь в feature/grid-system. main ушла на 40 коммитов.
-    Марк ненавидит merge-коммиты в feature-ветках.
-  goal: "Подтянуть изменения, оставив линейную историю."
+    Неделю сидишь в feature/grid-system, main за это время ушла на 40 коммитов вперёд.
+    Надо подтянуть изменения, но Елена написала в team-guidelines: "Никаких merge-коммитов
+    в feature-ветках — только rebase." Привычный git pull создаст merge-коммит,
+    который она точно заметит при ревью.
+  goal: "Подтянуть изменения из main, оставив линейную историю ветки."
+
   bank:
     commands: [fetch, rebase, pull, merge]
     flags: ["--rebase"]
@@ -35,13 +38,29 @@ inGame:
   forbiddenCommands:
     - "git reset --hard origin/main"
 
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
-    - "rebase даёт линейную историю."
+    - "rebase перекладывает твои коммиты поверх обновлённого main — без merge-коммита."
 
 knowledge:
   explanation: |
-    pull.rebase=true делает rebase поведением по умолчанию.
-  solutionsCommentary: []
+    pull.rebase=true в конфиге делает rebase поведением по умолчанию для pull.
+    fetch + rebase — явный двухшаговый вариант, pull --rebase — компактный однострочник.
+  solutionsCommentary:
+    - solutionLabel: "fetch + rebase"
+      commentary: |
+        Двухшаговый вариант: fetch обновляет remote-tracking ветки, rebase перекладывает
+        твои коммиты поверх. Явнее — видно что именно происходит на каждом шаге.
+        Предпочтителен когда хочешь посмотреть что пришло до rebase.
+    - solutionLabel: "pull --rebase"
+      commentary: |
+        Компактный однострочник: pull с --rebase делает fetch + rebase за один вызов.
+        Быстрее набирать. С pull.rebase=true в конфиге флаг можно не писать вовсе.
   aliases: []
   relatedKnowledge: [pull-rebase-config, linear-history-philosophy]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-pull(1)", url: "https://git-scm.com/docs/git-pull" }
+    - { title: "git-rebase(1)", url: "https://git-scm.com/docs/git-rebase" }

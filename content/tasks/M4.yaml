@@ -6,9 +6,12 @@ maxCommands: 3
 
 inGame:
   story: |
-    Соня запушила в main коммит (hash bad1234), ломающий сборку Storybook.
-    История запулена всеми.
-  goal: "Отменить эффект коммита, не переписывая историю."
+    Петя "быстро поправил" CSS в main и запушил коммит bad1234 — сборка Storybook
+    сразу упала, потому что он случайно удалил импорт темы. История уже спулена всей командой.
+    Елена в отпуске, но написала что revert одобрит. Переписывать историю нельзя —
+    у всех четверых уже эти коммиты локально.
+  goal: "Отменить эффект коммита bad1234, не переписывая историю."
+
   bank:
     commands: [revert, reset, push]
     flags: ["--hard", "--force", "--force-with-lease", "--no-edit"]
@@ -23,27 +26,40 @@ inGame:
 
   validSolutions:
     - kind: ideal
-      label: "revert + push"
-      sequence:
-        - step: "git revert bad1234"
-        - step: "git push"
-    - kind: standard
       label: "revert --no-edit + push"
       sequence:
         - step: "git revert --no-edit bad1234"
+        - step: "git push"
+    - kind: standard
+      label: "revert + push"
+      sequence:
+        - step: "git revert bad1234"
         - step: "git push"
 
   forbiddenCommands:
     - "git reset --hard HEAD~1"
     - "git push --force"
 
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
     - "revert создаёт новый коммит-инверсию. Push без force — история не переписывается."
 
 knowledge:
   explanation: |
-    Shared-история ≠ право на rewrite. revert безопасен для пушенных коммитов.
-  solutionsCommentary: []
+    Shared-история — не право на rewrite. revert безопасен для пушенных коммитов:
+    создаёт новый коммит, отменяющий изменения, без переписывания существующих.
+  solutionsCommentary:
+    - solutionLabel: "revert --no-edit + push"
+      commentary: |
+        --no-edit пропускает открытие редактора — git использует дефолтное сообщение
+        "Revert ...". Быстрее, когда сообщение не важно и нужно просто откатить быстро.
+    - solutionLabel: "revert + push"
+      commentary: |
+        Без --no-edit откроется редактор, можно добавить контекст: почему откатываешь,
+        ссылку на тикет. Полезно для аудит-трейла в командном репо.
   aliases: []
   relatedKnowledge: [revert-vs-reset, revert-merge-commits]
   externalLinks:

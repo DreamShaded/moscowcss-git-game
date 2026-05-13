@@ -6,9 +6,11 @@ maxCommands: 5
 
 inGame:
   story: |
-    Создал ветку fix-stuff, понял что должно быть fix/header-z-index.
-    Уже запушил, есть PR, но никто другой её не пуллил.
-  goal: "Переименовать локально и на remote, удалить старую."
+    Создал ветку fix-stuff и запушил её — хотел быстро набросать фикс z-index у хедера.
+    Потом посмотрел на название и понял: по командной конвенции должно быть fix/header-z-index.
+    PR уже открыт, но Елена ещё не смотрела. Никто другой ветку не пуллил — окно для переименования есть.
+  goal: "Переименовать ветку локально и на remote, удалить старую remote-ветку."
+
   bank:
     commands: [branch, push]
     flags: ["-m", "--delete", "-u"]
@@ -33,13 +35,26 @@ inGame:
   forbiddenCommands:
     - "git branch -D fix-stuff"
 
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
     - "branch -m переименовывает локально. Remote-tracking надо настроить заново через push -u."
+    - "Старую ветку на remote надо удалить отдельно — переименования на remote не существует."
 
 knowledge:
   explanation: |
     На remote нельзя «переименовать» ветку — только запушить новую и удалить старую.
-  solutionsCommentary: []
+    branch -m меняет только локальное имя, remote не знает об этом.
+  solutionsCommentary:
+    - solutionLabel: "branch -m + push -u + push --delete"
+      commentary: |
+        Три шага: переименовать локально, запушить новое имя с -u (настроить tracking),
+        удалить старое на remote. Порядок важен — сначала push нового, потом delete старого,
+        иначе на время останешься без remote-ветки и PR сломается.
   aliases: []
   relatedKnowledge: [push-autosetup, branch-move-mechanics]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-branch(1)", url: "https://git-scm.com/docs/git-branch" }
+    - { title: "git-push(1)", url: "https://git-scm.com/docs/git-push" }

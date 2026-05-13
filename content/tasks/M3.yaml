@@ -6,9 +6,19 @@ maxCommands: 6
 
 inGame:
   story: |
-    Три коммита: "wip", "wip 2", "finally works".
-    Марк требует один осмысленный коммит перед PR.
-  goal: "Схлопнуть три коммита в один с нормальным сообщением."
+    Три дня работал над вариантами кнопки, коммитил как придётся: "wip", "wip 2", "finally works".
+    Теперь пора открывать PR. Елена смотрит git log очень внимательно и уже писала
+    что WIP-коммиты в feature-ветках — это не окей. Нужен один чистый коммит с нормальным сообщением.
+  goal: "Схлопнуть три последних коммита в один с осмысленным сообщением."
+
+  initialStateDisplay:
+    branchLabel: "feature/button-variants"
+    commits:
+      - { hash: c1, message: "wip" }
+      - { hash: c2, message: "wip 2" }
+      - { hash: c3, message: "finally works" }
+    workingTree: "clean"
+
   bank:
     commands: [rebase, reset, commit]
     flags: ["-i", "--soft", "-m"]
@@ -21,6 +31,7 @@ inGame:
       - "git reset --soft HEAD~3"
       - 'git commit -m "feat: implement button variants"'
       - "git rebase -i HEAD~3"
+      - "git rebase --interactive HEAD~3"
 
   validSolutions:
     - kind: ideal
@@ -37,6 +48,11 @@ inGame:
             - "git rebase --interactive HEAD~3"
 
   forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
     - "reset --soft переводит коммиты в индекс одной командой."
     - "interactive rebase даёт больше контроля, но длиннее."
@@ -47,9 +63,18 @@ knowledge:
     Дальше — обычный commit. Альтернатива — rebase -i с пометкой squash/fixup.
   solutionsCommentary:
     - solutionLabel: "reset --soft + commit"
-      commentary: "Самый короткий путь полного squash."
+      commentary: |
+        Самый короткий путь когда нужно схлопнуть всё в один коммит: --soft оставляет
+        изменения в индексе, дальше просто коммитишь с нормальным сообщением.
+        Не даёт контроля над отдельными коммитами, зато минимально и быстро.
+    - solutionLabel: "interactive rebase"
+      commentary: |
+        rebase -i открывает редактор со списком коммитов — можно пометить часть как
+        squash или fixup, часть оставить, часть переименовать. Длиннее reset --soft,
+        но незаменимо когда нужно схлопнуть не все, а выборочные коммиты.
   aliases:
     - { from: "git rebase -i HEAD~3 (для полного squash)", to: "git reset --soft HEAD~3 && git commit", note: "Короче, если задача — схлопнуть всё в один." }
   relatedKnowledge: [rebase-interactive-actions, commit-fixup-flow]
   externalLinks:
     - { title: "git-rebase(1)", url: "https://git-scm.com/docs/git-rebase" }
+    - { title: "git-reset(1)", url: "https://git-scm.com/docs/git-reset" }

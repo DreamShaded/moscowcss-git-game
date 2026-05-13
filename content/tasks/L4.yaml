@@ -6,8 +6,11 @@ maxCommands: 3
 
 inGame:
   story: |
-    Закоммитил рефакторинг "extract mixins", забыл src/styles/_mixins.scss. Не пушил.
-  goal: "Добавить файл в тот же коммит, не создавая новый."
+    Сделал коммит "refactor: extract mixins" — и только потом заметил, что забыл
+    добавить сам файл src/styles/_mixins.scss. Он лежит в рабочей директории,
+    но в коммит не попал. Ещё не пушил, Рома ещё не смотрел.
+  goal: "Добавить пропущенный файл в тот же коммит, не создавая новый."
+
   bank:
     commands: [add, commit]
     flags: ["--amend", "--no-edit", "-m"]
@@ -34,13 +37,28 @@ inGame:
         - step: "git commit --amend"
 
   forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
     - "amend позволяет дополнить последний коммит."
 
 knowledge:
   explanation: |
     --amend --no-edit добавляет staged-изменения к HEAD без редактирования сообщения.
-  solutionsCommentary: []
+    Без --no-edit откроется редактор — можно случайно поменять сообщение.
+  solutionsCommentary:
+    - solutionLabel: "add + amend --no-edit"
+      commentary: |
+        --no-edit сохраняет текущее сообщение коммита без открытия редактора.
+        Идеально когда хочешь просто дополнить коммит без лишних шагов.
+    - solutionLabel: "add + amend"
+      commentary: |
+        То же самое, но без --no-edit откроется редактор с текущим сообщением.
+        Дольше, зато можно заодно уточнить формулировку если нужно.
   aliases: []
   relatedKnowledge: [amend-pitfalls]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-commit(1)", url: "https://git-scm.com/docs/git-commit" }

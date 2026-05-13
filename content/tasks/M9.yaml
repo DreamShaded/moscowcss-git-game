@@ -6,8 +6,12 @@ maxCommands: 8
 
 inGame:
   story: |
-    Ревьюишь чужой PR — нужно 5 раз посмотреть-сравнить состояние своей ветки и review/feature-x.
-  goal: "5 переключений между двумя ветками."
+    Рома открыл PR с веткой review/feature-x и попросил посмотреть вживую.
+    Нужно несколько раз переключиться между своей веткой и его — сравниваешь
+    поведение, возвращаешься проверить свой код, снова к нему. Туда-обратно раз пять.
+    Каждый раз набирать полное имя ветки утомительно.
+  goal: "Сделать 5 переключений между своей веткой my-branch и review/feature-x."
+
   bank:
     commands: [switch]
     args: ["-", "review/feature-x", "my-branch"]
@@ -21,28 +25,49 @@ inGame:
 
   validSolutions:
     - kind: ideal
-      label: "5 × switch -"
+      label: "switch - x4"
       sequence:
         - step: "git switch review/feature-x"
         - step: "git switch -"
         - step: "git switch -"
         - step: "git switch -"
         - step: "git switch -"
+    - kind: standard
+      label: "switch по имени x4"
+      sequence:
+        - step: "git switch review/feature-x"
+        - step: "git switch my-branch"
+        - step: "git switch review/feature-x"
+        - step: "git switch my-branch"
+        - step: "git switch review/feature-x"
+
+  forbiddenCommands: []
 
   pointsModifiers:
     bonuses:
       - condition: { type: usesArg, arg: "-" }
         points: 1
-        reason: "switch - короче полного имени"
+        reason: "switch - короче полного имени ветки"
     penalties: []
 
   hints:
-    - "switch - возвращает на предыдущую ветку."
+    - "switch - возвращает на предыдущую ветку без указания имени."
 
 knowledge:
   explanation: |
-    switch - и @{-1} — алиасы предыдущей ветки.
-  solutionsCommentary: []
+    switch - и checkout - используют @{-1} — ссылку на предыдущий HEAD.
+    При частых переключениях между двумя ветками экономит время на наборе имён.
+  solutionsCommentary:
+    - solutionLabel: "switch - x4"
+      commentary: |
+        switch - — алиас для "вернуться на предыдущую ветку". При чередовании двух веток
+        работает как toggle: каждый вызов переключает на ту, с которой только что ушёл.
+        Короче и быстрее — не нужно помнить и набирать полное имя.
+    - solutionLabel: "switch по имени x4"
+      commentary: |
+        Явный вариант — каждый раз пишешь полное имя ветки. Работает так же, просто
+        длиннее. Удобно когда переключаешься между тремя и более ветками, где - не поможет.
   aliases: []
   relatedKnowledge: [switch-dash-aliases, revision-syntax-deep]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-switch(1)", url: "https://git-scm.com/docs/git-switch" }

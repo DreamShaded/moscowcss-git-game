@@ -6,9 +6,13 @@ maxCommands: 8
 
 inGame:
   story: |
-    За 50 коммитов кто-то сломал :hover в Safari. CI зелёный, e2e не покрывает hover.
-    Скрипт npm run test:hover возвращает 0/1.
-  goal: "Найти ломающий коммит автоматически, откатить, выйти из bisect."
+    За последние 50 коммитов кто-то сломал :hover-состояние кнопок в Safari.
+    CI зелёный — e2e не покрывает hover. Егор написал скрипт npm run test:hover,
+    который возвращает 0 если ховер работает, 1 если нет. Руками бисектить
+    50 коммитов долго, но скрипт можно автоматизировать. Важно: после bisect
+    обязательно нужно выйти из режима bisect, иначе репо останется в непонятном состоянии.
+  goal: "Найти ломающий коммит через bisect, откатить его, выйти из режима bisect."
+
   bank:
     commands: [bisect, revert]
     flags: ["start", "good", "bad", "run", "reset"]
@@ -21,17 +25,29 @@ inGame:
       - "git bisect bad HEAD"
       - "git bisect good v1.0.0"
       - "git bisect run npm run test:hover"
+      - "git bisect good"
+      - "git bisect bad"
       - "git bisect reset"
       - "git revert found123"
 
   validSolutions:
     - kind: ideal
-      label: "bisect run"
+      label: "bisect run автоматический"
       sequence:
         - step: "git bisect start"
         - step: "git bisect bad HEAD"
         - step: "git bisect good v1.0.0"
         - step: "git bisect run npm run test:hover"
+        - step: "git bisect reset"
+        - step: "git revert found123"
+    - kind: standard
+      label: "bisect ручной"
+      sequence:
+        - step: "git bisect start"
+        - step: "git bisect bad HEAD"
+        - step: "git bisect good v1.0.0"
+        - step: "git bisect bad"
+        - step: "git bisect good"
         - step: "git bisect reset"
         - step: "git revert found123"
 
@@ -42,19 +58,27 @@ inGame:
       - condition: { type: usesFlag, flag: "run" }
         points: 2
         reason: "автоматизация через bisect run"
-    penalties:
-      - condition: { type: avoidsCommand, command: "git bisect reset" }
-        points: -1
-        reason: "не вышел из bisect"
+    penalties: []
 
   hints:
-    - "bisect run автоматизирует binary search через exit code."
-    - "Не забыть bisect reset перед revert."
+    - "bisect run автоматизирует binary search: exit 0 = good, exit 1 = bad."
+    - "Не забыть bisect reset в конце — иначе репо застрянет в bisect-режиме."
 
 knowledge:
   explanation: |
-    bisect run <cmd>: 0 = good, 1-127 (кроме 125) = bad, 125 = skip.
-  solutionsCommentary: []
+    bisect run <cmd>: git сам прогоняет команду на каждом шаге, 0 = good, 1-127 (кроме 125) = bad.
+    125 = skip (commit нельзя проверить). bisect reset обязателен для выхода из режима.
+  solutionsCommentary:
+    - solutionLabel: "bisect run автоматический"
+      commentary: |
+        bisect run передаёт скрипт и git сам прогоняет binary search — O(log N) шагов
+        без участия человека. Для 50 коммитов это ~6 проверок. Идеально когда есть
+        автоматизируемый тест: вместо часа ручной работы — несколько секунд.
+    - solutionLabel: "bisect ручной"
+      commentary: |
+        Ручной режим: git предлагает коммиты, ты проверяешь и отвечаешь good/bad.
+        Медленнее, но работает без тест-скрипта — когда нужно проверить визуально
+        или поведение сложно автоматизировать. git bisect reset в конце обязателен.
   aliases: []
   relatedKnowledge: [bisect-mechanics, bisect-run-exit-codes]
   externalLinks:

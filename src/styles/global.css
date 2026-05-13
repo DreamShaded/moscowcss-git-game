@@ -88,6 +88,23 @@ pre { white-space: pre-wrap; }
   grid-template-columns: minmax(280px, 2fr) minmax(380px, 3fr);
   gap: 24px;
 }
+.play-story {
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+}
+.play-story::-webkit-scrollbar {
+  width: 6px;
+}
+.play-story::-webkit-scrollbar-track {
+  background: transparent;
+}
+.play-story::-webkit-scrollbar-thumb {
+  background: rgba(155, 163, 175, 0.35);
+  border-radius: 3px;
+}
+.play-story::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 163, 175, 0.6);
+}
 .play-story h2 { font-size: 14px; color: var(--fg-dim); text-transform: uppercase; margin: 0 0 8px; }
 .play-story h3 { font-size: 13px; color: var(--fg-dim); margin: 16px 0 6px; }
 .story-text {

@@ -52,23 +52,10 @@ function readKnowledge(): Record<string, { title: string; html: string; source: 
 
 function buildBankFromTask(t: any): string[] {
   const b = t.inGame.bank || {};
-  const cmds: string[] = b.commands || [];
-  const flags: string[] = b.flags || [];
-  const args: string[] = b.args || [];
   const prebuilt: string[] = b.prebuilt || [];
   const decoys: string[] = b.decoys || [];
-  return [
-    ...cmds.map((c: string) => `git ${c}`),
-    ...flags,
-    ...args,
-    ...prebuilt,
-    ...decoys,
-  ].map(normalizeText);
-}
-
-function tokensFromStep(step: string): string[] {
-  const tokens = normalizeText(step).split(' ');
-  return tokens;
+  // bankChips = prebuilt ∪ decoys (ready strings, no atom decomposition)
+  return [...prebuilt, ...decoys].map(normalizeText);
 }
 
 function verifySolutionsBuildable(task: any, bank: string[]): string[] {
@@ -79,14 +66,21 @@ function verifySolutionsBuildable(task: any, bank: string[]): string[] {
       const variants: string[] = s.acceptableVariants?.length ? s.acceptableVariants : [s.step];
       let anyOk = false;
       for (const variant of variants) {
-        const tokens = tokensFromStep(variant);
-        const head = tokens[0] === 'git' ? `${tokens[0]} ${tokens[1] ?? ''}`.trim() : tokens[0];
-        const okHead = bankSet.has(head) || bankSet.has(variant);
-        const restOk = tokens.slice(2).every(tok => bankSet.has(tok) || /^["'].*["']$/.test(tok));
-        if (okHead && (tokens.length <= 2 || restOk || bankSet.has(variant))) { anyOk = true; break; }
-        if (bankSet.has(variant)) { anyOk = true; break; }
+        if (bankSet.has(normalizeText(variant))) { anyOk = true; break; }
       }
-      if (!anyOk) errors.push(`${task.id}: step "${s.step}" not buildable from bank`);
+      if (!anyOk) errors.push(`${task.id}: step "${s.step}" not in bank.prebuilt`);
+    }
+  }
+  return errors;
+}
+
+function verifySolutionsCommentary(task: any): string[] {
+  const errors: string[] = [];
+  const labels: string[] = (task.inGame.validSolutions ?? []).map((sol: any) => sol.label ?? '');
+  const commentaryLabels: string[] = (task.knowledge?.solutionsCommentary ?? []).map((c: any) => c.solutionLabel ?? '');
+  for (const label of labels) {
+    if (label && !commentaryLabels.includes(label)) {
+      errors.push(`${task.id}: validSolution label "${label}" has no solutionsCommentary entry`);
     }
   }
   return errors;
@@ -162,6 +156,9 @@ async function main() {
 
     const buildErrors = verifySolutionsBuildable(normalizedTask, normalizedTask.inGame.bankChips);
     errors.push(...buildErrors);
+
+    const commentaryErrors = verifySolutionsCommentary(t);
+    errors.push(...commentaryErrors);
 
     tasks.push(normalizedTask);
   }

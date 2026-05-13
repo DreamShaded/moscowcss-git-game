@@ -6,10 +6,13 @@ maxCommands: 2
 
 inGame:
   story: |
-    Сделал git rebase main на feature/forms, история сломалась.
-    Решил половину конфликтов, потом понял что подход неверный.
-    --abort уже не вариант (коммит посередине).
-  goal: "Вернуть ветку в pre-rebase позицию."
+    Запустил git rebase main на feature/forms — хотел линейную историю.
+    Начал разрешать конфликты, решил половину, а потом понял что подход неверный:
+    нужно было сначала поговорить с Алёной о стратегии. git rebase --abort уже
+    не поможет — ты уже продвинулся в середину rebase и сделал несколько коммитов.
+    Нужно вернуться в точку до rebase.
+  goal: "Вернуть ветку feature/forms в состояние до начала rebase."
+
   bank:
     commands: [reset, reflog]
     flags: ["--hard"]
@@ -33,20 +36,35 @@ inGame:
         - step: "git reflog"
         - step: "git reset --hard abc123"
 
+  forbiddenCommands: []
+
   pointsModifiers:
     bonuses:
       - condition: { type: usesArg, arg: "ORIG_HEAD" }
         points: 2
-        reason: "ORIG_HEAD — знание короткого пути"
+        reason: "ORIG_HEAD — прямой путь без reflog"
     penalties: []
 
   hints:
-    - "rebase выставляет ORIG_HEAD на pre-rebase позицию."
+    - "rebase выставляет ORIG_HEAD на pre-rebase позицию при старте."
 
 knowledge:
   explanation: |
     ORIG_HEAD выставляется reset, merge, rebase, pull перед опасной операцией.
-  solutionsCommentary: []
+    После rebase, даже незавершённого, он указывает на коммит до начала операции.
+  solutionsCommentary:
+    - solutionLabel: "reset ORIG_HEAD"
+      commentary: |
+        Одна команда: ORIG_HEAD выставляется в начале rebase и остаётся там, пока
+        другая "опасная" операция его не перезапишет. Знание этого спасает
+        в ситуациях когда --abort уже не вариант.
+    - solutionLabel: "reflog + reset"
+      commentary: |
+        Универсальный путь: reflog показывает все позиции HEAD с временными метками
+        и описанием операции (rebase-start, rebase-pick и т.д.). Находишь строку
+        до начала rebase — берёшь хэш для reset --hard.
   aliases: []
   relatedKnowledge: [orig-head-when-set, rebase-recovery]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-reflog(1)", url: "https://git-scm.com/docs/git-reflog" }
+    - { title: "git-reset(1)", url: "https://git-scm.com/docs/git-reset" }

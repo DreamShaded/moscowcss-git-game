@@ -6,9 +6,13 @@ maxCommands: 6
 
 inGame:
   story: |
-    Ветка develop (shared, 4 человека). Затесался коммит с лицензионно-проблемным шрифтом (bad7).
-    Все четверо уже спулили.
-  goal: "Переписать историю develop, force-push с safety."
+    В ветке develop (shared, четверо разработчиков) затесался коммит bad7 с
+    лицензионно-проблемным шрифтом — юрист сказал убрать немедленно.
+    Все четверо уже спулили эту ветку. Егор согласовал окно для force-push,
+    но предупредил: нужна защита от случайного перетирания чужих коммитов.
+    git push --force без проверки здесь не вариант.
+  goal: "Удалить коммит bad7 из истории develop, безопасно запушить с защитой от перетирания."
+
   bank:
     commands: [rebase, push]
     flags: ["-i", "--force", "--force-with-lease", "--force-if-includes"]
@@ -23,12 +27,12 @@ inGame:
 
   validSolutions:
     - kind: ideal
-      label: "rebase + force-with-lease + if-includes"
+      label: "rebase -i + force-with-lease + force-if-includes"
       sequence:
         - step: "git rebase -i bad7~1"
         - step: "git push --force-with-lease --force-if-includes origin develop"
     - kind: standard
-      label: "rebase + force-with-lease"
+      label: "rebase -i + force-with-lease"
       sequence:
         - step: "git rebase -i bad7~1"
         - step: "git push --force-with-lease origin develop"
@@ -40,19 +44,34 @@ inGame:
     bonuses:
       - condition: { type: usesFlag, flag: "--force-with-lease" }
         points: 2
-        reason: "safety force-push"
+        reason: "--force-with-lease защищает от перетирания чужих коммитов"
       - condition: { type: usesFlag, flag: "--force-if-includes" }
         points: 1
-        reason: "доп. защита от races"
+        reason: "--force-if-includes дополнительная защита от race condition"
     penalties: []
 
   hints:
-    - "--force-with-lease проверяет, что remote не ушёл вперёд."
+    - "--force-with-lease откажет если remote ушёл вперёд с момента последнего fetch."
+    - "rebase -i bad7~1 откроет список коммитов — пометь bad7 как drop."
 
 knowledge:
   explanation: |
-    --force-with-lease отказывается перезаписать, если ваш local-ref устарел.
-  solutionsCommentary: []
+    --force-with-lease проверяет что remote-ref совпадает с твоим local remote-tracking ref.
+    --force-if-includes дополнительно проверяет что ты интегрировал все remote-изменения.
+  solutionsCommentary:
+    - solutionLabel: "rebase -i + force-with-lease + force-if-includes"
+      commentary: |
+        Максимальная защита: --force-with-lease не даст пушить если кто-то успел запушить
+        в develop пока ты делал rebase. --force-if-includes дополнительно проверяет что
+        ты fetch'нул и смержил все remote-изменения. Оба флага вместе — best practice для
+        shared-веток.
+    - solutionLabel: "rebase -i + force-with-lease"
+      commentary: |
+        --force-with-lease без --force-if-includes уже намного безопаснее голого --force:
+        откажет если remote-ветка продвинулась вперёд. Достаточно для большинства случаев.
+        --force-if-includes нужен в редких race condition сценариях.
   aliases: []
   relatedKnowledge: [force-with-lease-vs-force, post-rewrite-team-protocol]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-push(1)", url: "https://git-scm.com/docs/git-push" }
+    - { title: "git-rebase(1)", url: "https://git-scm.com/docs/git-rebase" }

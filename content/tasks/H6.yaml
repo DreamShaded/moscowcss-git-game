@@ -6,9 +6,13 @@ maxCommands: 5
 
 inGame:
   story: |
-    Дизайн-токены в submodule. Кто-то закоммитил новый pointer,
-    но эта версия есть только локально у Леры. CI падает.
-  goal: "Откатить pointer сабмодуля на предыдущий валидный hash."
+    Дизайн-токены живут в отдельном репо, подключённом как submodule design-tokens.
+    Лера обновила токены локально и попросила Рому закоммитить новый pointer — он закоммитил,
+    но версия токенов есть только у Леры локально, на remote submodule её нет.
+    CI падает: не может скачать указанный коммит. Нужно откатить pointer на предыдущий
+    валидный хэш, который есть у всех.
+  goal: "Откатить pointer сабмодуля design-tokens на предыдущий валидный коммит."
+
   bank:
     commands: [submodule, checkout, commit]
     flags: ["update", "--init", "--recursive", "-m"]
@@ -32,14 +36,28 @@ inGame:
   forbiddenCommands:
     - "git submodule update --remote"
 
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
-    - "Pointer сабмодуля — это просто gitlink в дереве parent-коммита."
+    - "Pointer сабмодуля — это gitlink в дереве parent-коммита, можно откатить checkout."
+    - "--remote меняет pointer на последний remote — это противоположное тому, что нужно."
 
 knowledge:
   explanation: |
-    submodule update --init --recursive подтягивает локальный checkout под pointer.
-    --remote меняет pointer сам — это часто не то, что нужно.
-  solutionsCommentary: []
+    submodule — это просто gitlink (хэш коммита) в parent-репо. checkout HEAD~1 -- design-tokens
+    возвращает gitlink к предыдущему значению. submodule update --init приводит локальный
+    checkout в соответствие с новым (старым) pointer.
+  solutionsCommentary:
+    - solutionLabel: "checkout pointer + submodule update + commit"
+      commentary: |
+        checkout HEAD~1 -- design-tokens откатывает gitlink в индексе к предыдущему
+        значению (валидному хэшу). submodule update --init --recursive синхронизирует
+        локальный checkout субмодуля под этот pointer. commit фиксирует откат в истории.
+        --remote категорически нельзя — он переключит на последний коммит remote submodule,
+        что может сделать ситуацию ещё хуже.
   aliases: []
   relatedKnowledge: [submodule-pointer-mechanics, submodule-remote-flag]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-submodule(1)", url: "https://git-scm.com/docs/git-submodule" }

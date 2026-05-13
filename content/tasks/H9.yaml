@@ -6,11 +6,15 @@ maxCommands: 3
 
 inGame:
   story: |
-    Hash коммита-фикса fix555 должен быть в release/3.1, release/3.2, release/3.3.
-  goal: "Список веток с коммитом."
+    Егор сделал hotfix-коммит fix555 и сказал что он должен быть в release/3.1,
+    release/3.2 и release/3.3 — через cherry-pick поверх каждого релиза.
+    QA спрашивает: в какие ветки коммит реально попал? Проверять каждую ветку
+    вручную через git log долго, а релизных веток у вас ещё с десяток.
+  goal: "Найти все ветки, в которых есть коммит fix555."
+
   bank:
-    commands: [branch]
-    flags: ["--contains", "-a"]
+    commands: [branch, log]
+    flags: ["--contains", "-a", "-r"]
     args: ["fix555"]
     decoys:
       - "git log fix555.."
@@ -18,6 +22,7 @@ inGame:
     prebuilt:
       - "git branch --contains fix555"
       - "git branch -a --contains fix555"
+      - "git branch -r --contains fix555"
 
   validSolutions:
     - kind: ideal
@@ -28,14 +33,40 @@ inGame:
       label: "branch --contains"
       sequence:
         - step: "git branch --contains fix555"
+    - kind: long
+      label: "branch -r --contains"
+      sequence:
+        - step: "git branch -r --contains fix555"
+
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
 
   hints:
-    - "branch --contains <hash> покажет ветки с коммитом."
+    - "branch --contains <hash> покажет ветки у которых этот коммит — предок HEAD."
 
 knowledge:
   explanation: |
-    --contains <commitish>: ветки, у которых коммит — предок HEAD.
-  solutionsCommentary: []
+    --contains <commitish> возвращает ветки у которых коммит является предком.
+    -a показывает и локальные, и remote-tracking ветки. -r — только remote.
+  solutionsCommentary:
+    - solutionLabel: "branch -a --contains"
+      commentary: |
+        -a включает remote-tracking ветки (origin/release/3.1 и т.д.) — это полная картина.
+        Когда нужно проверить cherry-pick по нескольким релизным веткам, -a даст ответ
+        одной командой без переключения между ветками.
+    - solutionLabel: "branch --contains"
+      commentary: |
+        Без флагов показывает только локальные ветки. Работает если все релизные ветки
+        спулены локально. Если cherry-pick делали и пушили не заходя локально — результат
+        будет неполным.
+    - solutionLabel: "branch -r --contains"
+      commentary: |
+        -r — только remote-tracking ветки. Полезно когда нет локальных копий релизных веток
+        и не хочется их создавать. Покажет origin/release/3.x без fetch.
   aliases: []
   relatedKnowledge: [branch-contains, cherry-tool]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-branch(1)", url: "https://git-scm.com/docs/git-branch" }

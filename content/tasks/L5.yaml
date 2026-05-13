@@ -6,9 +6,12 @@ maxCommands: 2
 
 inGame:
   story: |
-    В feature/dark-mode наэкспериментировал в variables.css, всё поехало.
-    Вернуть только этот файл к версии из main. Остальные изменения в ветке сохранить.
-  goal: "Восстановить один файл из другой ветки, не трогая остальные правки."
+    В ветке feature/dark-mode ты неделю экспериментировал с variables.css — переменные,
+    цвета, отступы. В итоге что-то пошло не так: вся раскладка поехала.
+    Алёна говорит: "Верни variables.css к тому, что в main, остальное не трогай."
+    Переключаться на main и мержить нельзя — там своих изменений ещё на три дня.
+  goal: "Восстановить только src/styles/variables.css до версии из main, не трогая другие файлы."
+
   bank:
     commands: [checkout, restore, reset, show]
     flags: ["--source=main", "--"]
@@ -49,8 +52,16 @@ inGame:
 knowledge:
   explanation: |
     git restore --source=<ref> <path> — современный способ заменить файл версией из ref.
-    Без `--`/`-- path` checkout main переключит всю рабочую ветку.
-  solutionsCommentary: []
+    git checkout без -- <path> переключит всю ветку — запрещено в этой задаче.
+  solutionsCommentary:
+    - solutionLabel: "restore --source"
+      commentary: |
+        Современный синтаксис: restore с --source явно говорит "возьми файл из этого ref".
+        Не переключает ветку, не трогает другие файлы — именно то, что нужно.
+    - solutionLabel: "checkout -- path"
+      commentary: |
+        Старый способ через checkout с двойным тире. Работает так же, но --source
+        читается однозначнее. Опасность: без тире checkout main переключит ветку целиком.
   aliases:
     - { from: "git checkout main -- file", to: "git restore --source=main file", note: "Современная альтернатива" }
   relatedKnowledge: [restore-vs-checkout, git-show-paths]

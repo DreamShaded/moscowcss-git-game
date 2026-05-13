@@ -6,35 +6,54 @@ maxCommands: 6
 
 inGame:
   story: |
-    На середине рефакторинга в feature/grid, полтора дня незакоммиченной работы.
-    Прилетает hotfix. Stash страшно.
-  goal: "Открыть параллельную копию для hotfix/safari-flex от main, убрать worktree."
+    Полтора дня работаешь над рефакторингом в feature/grid — куча незакоммиченных
+    правок, stash страшно делать. Егор пишет: "Срочный hotfix для Safari flex-бага,
+    нужно сделать отдельную ветку от main прямо сейчас." Stash полутора дней работы
+    и риск всё потерять при pop — не вариант. Нужна параллельная копия репо.
+  goal: "Открыть параллельный worktree для hotfix/safari-flex от main, сделать коммит, убрать worktree."
+
   bank:
-    commands: [worktree]
-    flags: ["add", "remove", "-b"]
-    args: ["../cascadia-hotfix", "hotfix/safari-flex", "main"]
+    commands: [worktree, commit, push, stash]
+    flags: ["add", "remove", "-b", "list", "prune"]
+    args: ["../cascadia-hotfix", "hotfix/safari-flex", "main", '"fix: safari flex wrap"']
     decoys:
       - "git stash"
       - "git clone"
       - "git switch -c"
     prebuilt:
       - "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main"
+      - 'git commit -am "fix: safari flex wrap"'
       - "git worktree remove ../cascadia-hotfix"
 
   validSolutions:
     - kind: ideal
-      label: "worktree add + remove"
+      label: "worktree add + commit + remove"
       sequence:
         - step: "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main"
+        - step: 'git commit -am "fix: safari flex wrap"'
         - step: "git worktree remove ../cascadia-hotfix"
 
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
-    - "worktree даёт второй checkout того же репо в другой директории."
+    - "worktree add создаёт вторую рабочую директорию из того же репо."
+    - "В worktree можно коммитить независимо — основная ветка не затронута."
 
 knowledge:
   explanation: |
-    worktree — несколько рабочих копий одного .git. Каждая ветка может быть checked out в своём worktree.
-  solutionsCommentary: []
+    git worktree позволяет иметь несколько рабочих директорий из одного репо одновременно.
+    Разные ветки в разных папках — без stash, без clone, без риска потерять незакоммиченное.
+  solutionsCommentary:
+    - solutionLabel: "worktree add + commit + remove"
+      commentary: |
+        worktree add создаёт отдельную папку ../cascadia-hotfix с новой веткой hotfix/safari-flex
+        от main. Работаешь там, коммитишь, пушишь — основная директория с feature/grid нетронута.
+        После завершения worktree remove убирает папку и освобождает ветку.
   aliases: []
   relatedKnowledge: [worktree-mechanics, worktree-vs-clone]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-worktree(1)", url: "https://git-scm.com/docs/git-worktree" }

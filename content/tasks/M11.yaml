@@ -6,9 +6,12 @@ maxCommands: 2
 
 inGame:
   story: |
-    Витя добавлял/удалял !important в .btn-primary за последний месяц.
-    Найти все коммиты, где количество вхождений менялось.
-  goal: "Запустить правильную команду."
+    В styles/button.css снова появился !important в .btn-primary — третий раз за месяц.
+    Петя то добавляет его "временно", то кто-то убирает, то снова появляется.
+    Рома говорит: разберись кто и когда — нужно найти все коммиты,
+    где количество вхождений !important в этом файле менялось.
+  goal: "Найти все коммиты, изменявшие количество вхождений !important в styles/button.css."
+
   bank:
     commands: [log, blame, grep]
     flags: ["-S", "-G", "--grep", "--"]
@@ -30,13 +33,32 @@ inGame:
       sequence:
         - step: 'git log -G "!important" -- styles/button.css'
 
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
-    - "-S ищет изменения количества вхождений; -G — любые изменения совпадающих строк."
+    - "-S ищет коммиты, где изменилось число вхождений строки. -G ищет по regex в диффе."
 
 knowledge:
   explanation: |
-    Pickaxe (-S/-G) — search в diff'ах, а не в commit message (как --grep).
-  solutionsCommentary: []
+    Pickaxe (-S/-G) — поиск в diff'ах, а не в commit message (как --grep).
+    -S находит коммиты где количество вхождений строки изменилось (добавлено или удалено).
+    -G находит коммиты где diff содержит строку совпадающую с regex.
+  solutionsCommentary:
+    - solutionLabel: "log -S"
+      commentary: |
+        -S "строка" — pickaxe по точному совпадению: показывает коммиты где число вхождений
+        этой строки изменилось. Идеально для "кто добавил/удалил этот токен".
+        Отличается от --grep который смотрит только в сообщение коммита.
+    - solutionLabel: "log -G"
+      commentary: |
+        -G "regex" — поиск в diff'е по регулярному выражению. Находит коммиты где в диффе
+        есть строки совпадающие с паттерном — даже если сам токен не добавлялся/удалялся,
+        а менялось его окружение. Шире чем -S, иногда даёт лишние результаты.
   aliases: []
   relatedKnowledge: [pickaxe-vs-grep, log-L-function-history]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-log(1)", url: "https://git-scm.com/docs/git-log" }

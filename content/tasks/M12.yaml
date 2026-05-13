@@ -6,8 +6,13 @@ maxCommands: 2
 
 inGame:
   story: |
-    Локально wip-experiment, на remote должна быть feature/experiment-x.
-  goal: "На remote feature/experiment-x. Локально wip-experiment."
+    Неделю прототипировал новую анимацию загрузки в локальной ветке wip-experiment —
+    короткое имя, чтобы не задалбываться при переключениях. Прототип взлетел,
+    Алёна сказала: назови по конвенции feature/experiment-x — PR будет выглядеть нормально.
+    Переименовывать локально не хочется — три открытых терминала
+    с её именем, IDE-сессия. Нужно запушить так, чтобы на remote было правильное имя.
+  goal: "Запушить ветку на remote под именем feature/experiment-x, локально оставить wip-experiment."
+
   bank:
     commands: [push]
     flags: ["-u"]
@@ -28,13 +33,30 @@ inGame:
       sequence:
         - step: "git push -u origin wip-experiment:feature/experiment-x"
 
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
   hints:
-    - "Refspec в push: <local>:<remote>."
+    - "Refspec в push: <local>:<remote> — локальная ветка слева, remote справа."
 
 knowledge:
   explanation: |
     push <remote> <local>:<remote_branch> — отправляет под произвольным именем.
-  solutionsCommentary: []
+    Локальная ветка и remote-ветка могут называться по-разному.
+  solutionsCommentary:
+    - solutionLabel: "push refspec"
+      commentary: |
+        Refspec <local>:<remote> говорит git: "возьми локальную ветку wip-experiment,
+        запушь её на remote как feature/experiment-x". Локальное имя не меняется.
+        Без -u tracking не настраивается — следующий push нужно делать так же явно.
+    - solutionLabel: "push -u refspec"
+      commentary: |
+        То же самое, но -u настраивает upstream-tracking: после этого git push без аргументов
+        будет знать куда пушить. Удобнее если планируешь пушить эту ветку регулярно.
   aliases: []
   relatedKnowledge: [push-refspec, triangular-workflows]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-push(1)", url: "https://git-scm.com/docs/git-push" }

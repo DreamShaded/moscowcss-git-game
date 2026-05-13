@@ -6,11 +6,14 @@ maxCommands: 5
 
 inGame:
   story: |
-    Витя 3 месяца назад закоммитил .env с production-ключами.
-    Прошёл через 200+ коммитов. Команда оповещена, окно для force-push согласовано.
-  goal: "Удалить файл из всей истории, force-push на remote."
+    Три месяца назад Петя закоммитил .env с production-ключами — "временно, потом уберу".
+    Файл прошёл через 200+ коммитов и до сих пор в истории. Безопасники нашли его при аудите.
+    Команда оповещена, окно для force-push согласовано с Егором. Ключи уже ротированы,
+    но файл нужно вычистить из истории полностью — включая теги.
+  goal: "Удалить .env из всей истории репо, запушить изменения включая теги."
+
   bank:
-    commands: [filter-repo, push]
+    commands: [filter-repo, push, rm]
     flags: ["--path", "--invert-paths", "--force", "--all", "--tags"]
     args: [".env", "origin"]
     decoys:
@@ -29,24 +32,34 @@ inGame:
         - step: "git push --force --all"
         - step: "git push --force --tags"
 
+  forbiddenCommands: []
+
   pointsModifiers:
     bonuses:
-      - condition: { type: usesCommand, command: "git filter-repo" }
-        points: 1
-        reason: "filter-repo (рекомендован git над filter-branch)"
       - condition: { type: usesFlag, flag: "--tags" }
         points: 1
-        reason: "не забыл теги"
+        reason: "теги тоже содержат историю — важно пушить отдельно"
+      - condition: { type: usesCommand, command: "git filter-repo" }
+        points: 1
+        reason: "filter-repo быстрее и безопаснее filter-branch"
     penalties: []
 
   hints:
-    - "filter-repo заменил filter-branch."
-    - "Не забыть пушнуть теги — они отдельно."
+    - "filter-repo --invert-paths удаляет указанный путь из всей истории."
+    - "Не забыть пушнуть теги отдельно — они не входят в --all."
 
 knowledge:
   explanation: |
-    git-filter-repo — внешний, но рекомендованный инструмент для переписывания истории.
-  solutionsCommentary: []
+    git-filter-repo — рекомендованная замена filter-branch. Работает быстрее, безопаснее.
+    --invert-paths значит "всё кроме указанного пути" — удаляет файл из истории.
+  solutionsCommentary:
+    - solutionLabel: "filter-repo + push all/tags"
+      commentary: |
+        filter-repo переписывает всю историю локально. После этого remote и local расходятся —
+        нужен force-push. --all пушит все ветки, --tags — все теги отдельно (они не попадают
+        в --all автоматически). Пропустить теги — значит оставить .env в тегированных релизах.
   aliases: []
   relatedKnowledge: [filter-repo-vs-branch, bfg-alternative, post-rewrite-protocol]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-filter-repo", url: "https://github.com/newren/git-filter-repo" }
+    - { title: "git-push(1)", url: "https://git-scm.com/docs/git-push" }

@@ -7,8 +7,8 @@
       "points": 7,
       "maxCommands": 8,
       "inGame": {
-        "story": "За 50 коммитов кто-то сломал :hover в Safari. CI зелёный, e2e не покрывает hover.\nСкрипт npm run test:hover возвращает 0/1.\n",
-        "goal": "Найти ломающий коммит автоматически, откатить, выйти из bisect.",
+        "story": "За последние 50 коммитов кто-то сломал :hover-состояние кнопок в Safari.\nCI зелёный — e2e не покрывает hover. Егор написал скрипт npm run test:hover,\nкоторый возвращает 0 если ховер работает, 1 если нет. Руками бисектить\n50 коммитов долго, но скрипт можно автоматизировать. Важно: после bisect\nобязательно нужно выйти из режима bisect, иначе репо останется в непонятном состоянии.\n",
+        "goal": "Найти ломающий коммит через bisect, откатить его, выйти из режима bisect.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -37,26 +37,19 @@
             "git bisect bad HEAD",
             "git bisect good v1.0.0",
             "git bisect run npm run test:hover",
+            "git bisect good",
+            "git bisect bad",
             "git bisect reset",
             "git revert found123"
           ]
         },
         "bankChips": [
-          "git bisect",
-          "git revert",
-          "start",
-          "good",
-          "bad",
-          "run",
-          "reset",
-          "HEAD",
-          "v1.0.0",
-          "npm run test:hover",
-          "found123",
           "git bisect start",
           "git bisect bad HEAD",
           "git bisect good v1.0.0",
           "git bisect run npm run test:hover",
+          "git bisect good",
+          "git bisect bad",
           "git bisect reset",
           "git revert found123",
           "git blame",
@@ -65,7 +58,7 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "bisect run",
+            "label": "bisect run автоматический",
             "sequence": [
               {
                 "step": "git bisect start",
@@ -104,6 +97,54 @@
                 ]
               }
             ]
+          },
+          {
+            "kind": "standard",
+            "label": "bisect ручной",
+            "sequence": [
+              {
+                "step": "git bisect start",
+                "acceptableVariants": [
+                  "git bisect start"
+                ]
+              },
+              {
+                "step": "git bisect bad HEAD",
+                "acceptableVariants": [
+                  "git bisect bad HEAD"
+                ]
+              },
+              {
+                "step": "git bisect good v1.0.0",
+                "acceptableVariants": [
+                  "git bisect good v1.0.0"
+                ]
+              },
+              {
+                "step": "git bisect bad",
+                "acceptableVariants": [
+                  "git bisect bad"
+                ]
+              },
+              {
+                "step": "git bisect good",
+                "acceptableVariants": [
+                  "git bisect good"
+                ]
+              },
+              {
+                "step": "git bisect reset",
+                "acceptableVariants": [
+                  "git bisect reset"
+                ]
+              },
+              {
+                "step": "git revert found123",
+                "acceptableVariants": [
+                  "git revert found123"
+                ]
+              }
+            ]
           }
         ],
         "forbiddenCommands": [],
@@ -118,25 +159,25 @@
               "reason": "автоматизация через bisect run"
             }
           ],
-          "penalties": [
-            {
-              "condition": {
-                "type": "avoidsCommand",
-                "command": "git bisect reset"
-              },
-              "points": -1,
-              "reason": "не вышел из bisect"
-            }
-          ]
+          "penalties": []
         },
         "hints": [
-          "bisect run автоматизирует binary search через exit code.",
-          "Не забыть bisect reset перед revert."
+          "bisect run автоматизирует binary search: exit 0 = good, exit 1 = bad.",
+          "Не забыть bisect reset в конце — иначе репо застрянет в bisect-режиме."
         ]
       },
       "knowledge": {
-        "explanation": "bisect run <cmd>: 0 = good, 1-127 (кроме 125) = bad, 125 = skip.\n",
-        "solutionsCommentary": [],
+        "explanation": "bisect run <cmd>: git сам прогоняет команду на каждом шаге, 0 = good, 1-127 (кроме 125) = bad.\n125 = skip (commit нельзя проверить). bisect reset обязателен для выхода из режима.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "bisect run автоматический",
+            "commentary": "bisect run передаёт скрипт и git сам прогоняет binary search — O(log N) шагов\nбез участия человека. Для 50 коммитов это ~6 проверок. Идеально когда есть\nавтоматизируемый тест: вместо часа ручной работы — несколько секунд.\n"
+          },
+          {
+            "solutionLabel": "bisect ручной",
+            "commentary": "Ручной режим: git предлагает коммиты, ты проверяешь и отвечаешь good/bad.\nМедленнее, но работает без тест-скрипта — когда нужно проверить визуально\nили поведение сложно автоматизировать. git bisect reset в конце обязателен.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -158,8 +199,8 @@
       "points": 7,
       "maxCommands": 8,
       "inGame": {
-        "story": "refactor/css-architecture живёт месяц. Каждую неделю мержишь main,\nи каждый раз одни и те же 12 конфликтов в theme.css.\n",
-        "goal": "Настроить rerere, сделать первый merge с запоминанием.",
+        "story": "Ветка refactor/css-architecture живёт уже месяц. Каждую неделю Лера переименовывает\nтокены в theme.css, и при очередном merge main в твою ветку вспыхивают одни и те же\n12 конфликтов — ты их уже решал три раза подряд. Алёна подсказала: есть механизм,\nкоторый запоминает как ты решил конфликт и применяет автоматически в следующий раз.\n",
+        "goal": "Включить rerere, сделать merge main с запоминанием разрешения конфликтов.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -169,11 +210,11 @@
             "commit"
           ],
           "flags": [
-            "--global",
-            "rerere.enabled",
-            "true"
+            "--global"
           ],
           "args": [
+            "rerere.enabled",
+            "true",
             "theme.css",
             "main"
           ],
@@ -184,22 +225,15 @@
           ],
           "prebuilt": [
             "git config --global rerere.enabled true",
+            "git config rerere.enabled true",
             "git merge main",
             "git add theme.css",
             "git commit"
           ]
         },
         "bankChips": [
-          "git config",
-          "git merge",
-          "git add",
-          "git commit",
-          "--global",
-          "rerere.enabled",
-          "true",
-          "theme.css",
-          "main",
           "git config --global rerere.enabled true",
+          "git config rerere.enabled true",
           "git merge main",
           "git add theme.css",
           "git commit",
@@ -210,12 +244,42 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "config + merge + add + commit",
+            "label": "config --global + merge + add + commit",
             "sequence": [
               {
                 "step": "git config --global rerere.enabled true",
                 "acceptableVariants": [
                   "git config --global rerere.enabled true"
+                ]
+              },
+              {
+                "step": "git merge main",
+                "acceptableVariants": [
+                  "git merge main"
+                ]
+              },
+              {
+                "step": "git add theme.css",
+                "acceptableVariants": [
+                  "git add theme.css"
+                ]
+              },
+              {
+                "step": "git commit",
+                "acceptableVariants": [
+                  "git commit"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "config per-repo + merge + add + commit",
+            "sequence": [
+              {
+                "step": "git config rerere.enabled true",
+                "acceptableVariants": [
+                  "git config rerere.enabled true"
                 ]
               },
               {
@@ -248,25 +312,44 @@
                 "flag": "--global"
               },
               "points": 1,
-              "reason": "глобально — для всех репо"
+              "reason": "--global включает rerere для всех репозиториев"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "rerere = REuse REcorded REsolution."
+          "rerere = REuse REcorded REsolution. Нужно сначала включить в конфиге.",
+          "--global включает для всех репо, без него — только для текущего."
         ]
       },
       "knowledge": {
-        "explanation": "rerere запоминает resolved-конфликты и применяет автоматически при повторе.\n",
-        "solutionsCommentary": [],
+        "explanation": "rerere запоминает как ты разрешил конфликт и применяет автоматически при повторе.\nХранит решения в .git/rr-cache/. --global включает для всех репо, без флага — только текущее.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "config --global + merge + add + commit",
+            "commentary": "--global включает rerere для всех твоих репо сразу — один раз настроил и забыл.\nПосле первого merge с разрешением конфликтов rerere запомнит решение. При следующем\nmerge тех же конфликтов применит автоматически. Бонус за --global: полезнее per-repo.\n"
+          },
+          {
+            "solutionLabel": "config per-repo + merge + add + commit",
+            "commentary": "Без --global rerere включается только для текущего репо. Логично когда не хочешь\nменять глобальный конфиг или нужно изолировать настройку. Работает так же, просто\nнужно повторить для каждого нового репо где возникнут повторяющиеся конфликты.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "rerere-internals",
           "rerere-forget"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-rerere(1)",
+            "url": "https://git-scm.com/docs/git-rerere"
+          },
+          {
+            "title": "git-config(1)",
+            "url": "https://git-scm.com/docs/git-config"
+          }
+        ]
       }
     },
     {
@@ -276,22 +359,28 @@
       "points": 7,
       "maxCommands": 6,
       "inGame": {
-        "story": "На середине рефакторинга в feature/grid, полтора дня незакоммиченной работы.\nПрилетает hotfix. Stash страшно.\n",
-        "goal": "Открыть параллельную копию для hotfix/safari-flex от main, убрать worktree.",
+        "story": "Полтора дня работаешь над рефакторингом в feature/grid — куча незакоммиченных\nправок, stash страшно делать. Егор пишет: \"Срочный hotfix для Safari flex-бага,\nнужно сделать отдельную ветку от main прямо сейчас.\" Stash полутора дней работы\nи риск всё потерять при pop — не вариант. Нужна параллельная копия репо.\n",
+        "goal": "Открыть параллельный worktree для hotfix/safari-flex от main, сделать коммит, убрать worktree.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
-            "worktree"
+            "worktree",
+            "commit",
+            "push",
+            "stash"
           ],
           "flags": [
             "add",
             "remove",
-            "-b"
+            "-b",
+            "list",
+            "prune"
           ],
           "args": [
             "../cascadia-hotfix",
             "hotfix/safari-flex",
-            "main"
+            "main",
+            "\"fix: safari flex wrap\""
           ],
           "decoys": [
             "git stash",
@@ -300,18 +389,13 @@
           ],
           "prebuilt": [
             "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main",
+            "git commit -am \"fix: safari flex wrap\"",
             "git worktree remove ../cascadia-hotfix"
           ]
         },
         "bankChips": [
-          "git worktree",
-          "add",
-          "remove",
-          "-b",
-          "../cascadia-hotfix",
-          "hotfix/safari-flex",
-          "main",
           "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main",
+          "git commit -am \"fix: safari flex wrap\"",
           "git worktree remove ../cascadia-hotfix",
           "git stash",
           "git clone",
@@ -320,12 +404,18 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "worktree add + remove",
+            "label": "worktree add + commit + remove",
             "sequence": [
               {
                 "step": "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main",
                 "acceptableVariants": [
                   "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main"
+                ]
+              },
+              {
+                "step": "git commit -am \"fix: safari flex wrap\"",
+                "acceptableVariants": [
+                  "git commit -am \"fix: safari flex wrap\""
                 ]
               },
               {
@@ -343,19 +433,30 @@
           "penalties": []
         },
         "hints": [
-          "worktree даёт второй checkout того же репо в другой директории."
+          "worktree add создаёт вторую рабочую директорию из того же репо.",
+          "В worktree можно коммитить независимо — основная ветка не затронута."
         ]
       },
       "knowledge": {
-        "explanation": "worktree — несколько рабочих копий одного .git. Каждая ветка может быть checked out в своём worktree.\n",
-        "solutionsCommentary": [],
+        "explanation": "git worktree позволяет иметь несколько рабочих директорий из одного репо одновременно.\nРазные ветки в разных папках — без stash, без clone, без риска потерять незакоммиченное.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "worktree add + commit + remove",
+            "commentary": "worktree add создаёт отдельную папку ../cascadia-hotfix с новой веткой hotfix/safari-flex\nот main. Работаешь там, коммитишь, пушишь — основная директория с feature/grid нетронута.\nПосле завершения worktree remove убирает папку и освобождает ветку.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "worktree-mechanics",
           "worktree-vs-clone"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-worktree(1)",
+            "url": "https://git-scm.com/docs/git-worktree"
+          }
+        ]
       }
     },
     {
@@ -365,13 +466,14 @@
       "points": 7,
       "maxCommands": 5,
       "inGame": {
-        "story": "Витя 3 месяца назад закоммитил .env с production-ключами.\nПрошёл через 200+ коммитов. Команда оповещена, окно для force-push согласовано.\n",
-        "goal": "Удалить файл из всей истории, force-push на remote.",
+        "story": "Три месяца назад Петя закоммитил .env с production-ключами — \"временно, потом уберу\".\nФайл прошёл через 200+ коммитов и до сих пор в истории. Безопасники нашли его при аудите.\nКоманда оповещена, окно для force-push согласовано с Егором. Ключи уже ротированы,\nно файл нужно вычистить из истории полностью — включая теги.\n",
+        "goal": "Удалить .env из всей истории репо, запушить изменения включая теги.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
             "filter-repo",
-            "push"
+            "push",
+            "rm"
           ],
           "flags": [
             "--path",
@@ -395,15 +497,6 @@
           ]
         },
         "bankChips": [
-          "git filter-repo",
-          "git push",
-          "--path",
-          "--invert-paths",
-          "--force",
-          "--all",
-          "--tags",
-          ".env",
-          "origin",
           "git filter-repo --path .env --invert-paths",
           "git push --force --all",
           "git push --force --tags",
@@ -441,31 +534,36 @@
           "bonuses": [
             {
               "condition": {
-                "type": "usesCommand",
-                "command": "git filter-repo"
-              },
-              "points": 1,
-              "reason": "filter-repo (рекомендован git над filter-branch)"
-            },
-            {
-              "condition": {
                 "type": "usesFlag",
                 "flag": "--tags"
               },
               "points": 1,
-              "reason": "не забыл теги"
+              "reason": "теги тоже содержат историю — важно пушить отдельно"
+            },
+            {
+              "condition": {
+                "type": "usesCommand",
+                "command": "git filter-repo"
+              },
+              "points": 1,
+              "reason": "filter-repo быстрее и безопаснее filter-branch"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "filter-repo заменил filter-branch.",
-          "Не забыть пушнуть теги — они отдельно."
+          "filter-repo --invert-paths удаляет указанный путь из всей истории.",
+          "Не забыть пушнуть теги отдельно — они не входят в --all."
         ]
       },
       "knowledge": {
-        "explanation": "git-filter-repo — внешний, но рекомендованный инструмент для переписывания истории.\n",
-        "solutionsCommentary": [],
+        "explanation": "git-filter-repo — рекомендованная замена filter-branch. Работает быстрее, безопаснее.\n--invert-paths значит \"всё кроме указанного пути\" — удаляет файл из истории.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "filter-repo + push all/tags",
+            "commentary": "filter-repo переписывает всю историю локально. После этого remote и local расходятся —\nнужен force-push. --all пушит все ветки, --tags — все теги отдельно (они не попадают\nв --all автоматически). Пропустить теги — значит оставить .env в тегированных релизах.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -473,7 +571,16 @@
           "bfg-alternative",
           "post-rewrite-protocol"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-filter-repo",
+            "url": "https://github.com/newren/git-filter-repo"
+          },
+          {
+            "title": "git-push(1)",
+            "url": "https://git-scm.com/docs/git-push"
+          }
+        ]
       }
     },
     {
@@ -483,16 +590,18 @@
       "points": 7,
       "maxCommands": 5,
       "inGame": {
-        "story": "Соня сделала git branch -D feature/animations локально и git push origin --delete.\n2 недели работы. Никто другой не пуллил.\n",
-        "goal": "Восстановить ветку локально и на remote.",
+        "story": "Дарина решила \"почистить\" локальные ветки и запустила git branch -D feature/animations,\nа потом git push origin --delete. Две недели работы над анимациями онбординга\n— исчезли. Никто другой ветку не пуллил, на remote её больше нет.\nПришла с красными глазами — говорит что не пушила последние три дня.\n",
+        "goal": "Восстановить ветку feature/animations локально и запушить на remote.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
             "reflog",
             "branch",
-            "push"
+            "push",
+            "fsck"
           ],
           "flags": [
+            "--lost-found",
             "-u"
           ],
           "args": [
@@ -507,20 +616,15 @@
           "prebuilt": [
             "git reflog",
             "git branch feature/animations lost123",
-            "git push -u origin feature/animations"
+            "git push -u origin feature/animations",
+            "git fsck --lost-found"
           ]
         },
         "bankChips": [
           "git reflog",
-          "git branch",
-          "git push",
-          "-u",
-          "lost123",
-          "feature/animations",
-          "origin",
-          "git reflog",
           "git branch feature/animations lost123",
           "git push -u origin feature/animations",
+          "git fsck --lost-found",
           "git clone",
           "git pull"
         ],
@@ -548,6 +652,30 @@
                 ]
               }
             ]
+          },
+          {
+            "kind": "standard",
+            "label": "fsck + branch + push",
+            "sequence": [
+              {
+                "step": "git fsck --lost-found",
+                "acceptableVariants": [
+                  "git fsck --lost-found"
+                ]
+              },
+              {
+                "step": "git branch feature/animations lost123",
+                "acceptableVariants": [
+                  "git branch feature/animations lost123"
+                ]
+              },
+              {
+                "step": "git push -u origin feature/animations",
+                "acceptableVariants": [
+                  "git push -u origin feature/animations"
+                ]
+              }
+            ]
           }
         ],
         "forbiddenCommands": [],
@@ -556,12 +684,22 @@
           "penalties": []
         },
         "hints": [
-          "reflog показывает HEAD-историю, даже когда ветка удалена."
+          "reflog хранит историю позиций HEAD — ветка удалена, но коммиты живы в reflog.",
+          "fsck --lost-found найдёт dangling коммиты, не достижимые из веток."
         ]
       },
       "knowledge": {
-        "explanation": "Удалённая ветка живёт в reflog до gc.\n",
-        "solutionsCommentary": [],
+        "explanation": "Удалённая ветка — это просто указатель. Коммиты живут в объектном хранилище\nдо gc/prune (90 дней). reflog показывает хэши даже удалённых веток через историю HEAD.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "reflog + branch + push",
+            "commentary": "reflog хранит историю HEAD: все переключения, коммиты, операции. После удаления\nветки её последний коммит виден как \"checkout: moving from feature/animations to ...\".\nБерёшь хэш, создаёшь ветку — готово. Быстрее fsck для свежих потерь.\n"
+          },
+          {
+            "solutionLabel": "fsck + branch + push",
+            "commentary": "fsck --lost-found находит dangling objects — коммиты, не достижимые ни из одной ветки\nили тега. Записывает хэши в .git/lost-found/. Медленнее reflog, но работает даже\nкогда reflog уже не помогает (например после gc или давней потери).\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -569,7 +707,16 @@
           "fsck-dangling",
           "gc-timing"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-reflog(1)",
+            "url": "https://git-scm.com/docs/git-reflog"
+          },
+          {
+            "title": "git-fsck(1)",
+            "url": "https://git-scm.com/docs/git-fsck"
+          }
+        ]
       }
     },
     {
@@ -579,8 +726,8 @@
       "points": 7,
       "maxCommands": 5,
       "inGame": {
-        "story": "Дизайн-токены в submodule. Кто-то закоммитил новый pointer,\nно эта версия есть только локально у Леры. CI падает.\n",
-        "goal": "Откатить pointer сабмодуля на предыдущий валидный hash.",
+        "story": "Дизайн-токены живут в отдельном репо, подключённом как submodule design-tokens.\nЛера обновила токены локально и попросила Рому закоммитить новый pointer — он закоммитил,\nно версия токенов есть только у Леры локально, на remote submodule её нет.\nCI падает: не может скачать указанный коммит. Нужно откатить pointer на предыдущий\nвалидный хэш, который есть у всех.\n",
+        "goal": "Откатить pointer сабмодуля design-tokens на предыдущий валидный коммит.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -610,16 +757,6 @@
           ]
         },
         "bankChips": [
-          "git submodule",
-          "git checkout",
-          "git commit",
-          "update",
-          "--init",
-          "--recursive",
-          "-m",
-          "design-tokens",
-          "HEAD~1",
-          "\"fix: rollback design-tokens pointer\"",
           "git checkout HEAD~1 -- design-tokens",
           "git submodule update --init --recursive",
           "git commit -m \"fix: rollback design-tokens pointer\"",
@@ -660,19 +797,30 @@
           "penalties": []
         },
         "hints": [
-          "Pointer сабмодуля — это просто gitlink в дереве parent-коммита."
+          "Pointer сабмодуля — это gitlink в дереве parent-коммита, можно откатить checkout.",
+          "--remote меняет pointer на последний remote — это противоположное тому, что нужно."
         ]
       },
       "knowledge": {
-        "explanation": "submodule update --init --recursive подтягивает локальный checkout под pointer.\n--remote меняет pointer сам — это часто не то, что нужно.\n",
-        "solutionsCommentary": [],
+        "explanation": "submodule — это просто gitlink (хэш коммита) в parent-репо. checkout HEAD~1 -- design-tokens\nвозвращает gitlink к предыдущему значению. submodule update --init приводит локальный\ncheckout в соответствие с новым (старым) pointer.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "checkout pointer + submodule update + commit",
+            "commentary": "checkout HEAD~1 -- design-tokens откатывает gitlink в индексе к предыдущему\nзначению (валидному хэшу). submodule update --init --recursive синхронизирует\nлокальный checkout субмодуля под этот pointer. commit фиксирует откат в истории.\n--remote категорически нельзя — он переключит на последний коммит remote submodule,\nчто может сделать ситуацию ещё хуже.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "submodule-pointer-mechanics",
           "submodule-remote-flag"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-submodule(1)",
+            "url": "https://git-scm.com/docs/git-submodule"
+          }
+        ]
       }
     },
     {
@@ -682,8 +830,8 @@
       "points": 7,
       "maxCommands": 6,
       "inGame": {
-        "story": "Ветка develop (shared, 4 человека). Затесался коммит с лицензионно-проблемным шрифтом (bad7).\nВсе четверо уже спулили.\n",
-        "goal": "Переписать историю develop, force-push с safety.",
+        "story": "В ветке develop (shared, четверо разработчиков) затесался коммит bad7 с\nлицензионно-проблемным шрифтом — юрист сказал убрать немедленно.\nВсе четверо уже спулили эту ветку. Егор согласовал окно для force-push,\nно предупредил: нужна защита от случайного перетирания чужих коммитов.\ngit push --force без проверки здесь не вариант.\n",
+        "goal": "Удалить коммит bad7 из истории develop, безопасно запушить с защитой от перетирания.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -712,15 +860,6 @@
           ]
         },
         "bankChips": [
-          "git rebase",
-          "git push",
-          "-i",
-          "--force",
-          "--force-with-lease",
-          "--force-if-includes",
-          "bad7~1",
-          "origin",
-          "develop",
           "git rebase -i bad7~1",
           "git push --force-with-lease origin develop",
           "git push --force-with-lease --force-if-includes origin develop",
@@ -730,7 +869,7 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "rebase + force-with-lease + if-includes",
+            "label": "rebase -i + force-with-lease + force-if-includes",
             "sequence": [
               {
                 "step": "git rebase -i bad7~1",
@@ -748,7 +887,7 @@
           },
           {
             "kind": "standard",
-            "label": "rebase + force-with-lease",
+            "label": "rebase -i + force-with-lease",
             "sequence": [
               {
                 "step": "git rebase -i bad7~1",
@@ -776,7 +915,7 @@
                 "flag": "--force-with-lease"
               },
               "points": 2,
-              "reason": "safety force-push"
+              "reason": "--force-with-lease защищает от перетирания чужих коммитов"
             },
             {
               "condition": {
@@ -784,25 +923,44 @@
                 "flag": "--force-if-includes"
               },
               "points": 1,
-              "reason": "доп. защита от races"
+              "reason": "--force-if-includes дополнительная защита от race condition"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "--force-with-lease проверяет, что remote не ушёл вперёд."
+          "--force-with-lease откажет если remote ушёл вперёд с момента последнего fetch.",
+          "rebase -i bad7~1 откроет список коммитов — пометь bad7 как drop."
         ]
       },
       "knowledge": {
-        "explanation": "--force-with-lease отказывается перезаписать, если ваш local-ref устарел.\n",
-        "solutionsCommentary": [],
+        "explanation": "--force-with-lease проверяет что remote-ref совпадает с твоим local remote-tracking ref.\n--force-if-includes дополнительно проверяет что ты интегрировал все remote-изменения.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "rebase -i + force-with-lease + force-if-includes",
+            "commentary": "Максимальная защита: --force-with-lease не даст пушить если кто-то успел запушить\nв develop пока ты делал rebase. --force-if-includes дополнительно проверяет что\nты fetch'нул и смержил все remote-изменения. Оба флага вместе — best practice для\nshared-веток.\n"
+          },
+          {
+            "solutionLabel": "rebase -i + force-with-lease",
+            "commentary": "--force-with-lease без --force-if-includes уже намного безопаснее голого --force:\nоткажет если remote-ветка продвинулась вперёд. Достаточно для большинства случаев.\n--force-if-includes нужен в редких race condition сценариях.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "force-with-lease-vs-force",
           "post-rewrite-team-protocol"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-push(1)",
+            "url": "https://git-scm.com/docs/git-push"
+          },
+          {
+            "title": "git-rebase(1)",
+            "url": "https://git-scm.com/docs/git-rebase"
+          }
+        ]
       }
     },
     {
@@ -812,9 +970,42 @@
       "points": 7,
       "maxCommands": 4,
       "inGame": {
-        "story": "feature/forms по ошибке ответвилась от feature/buttons вместо main.\nПоследние 4 коммита — твои, чистые.\n",
-        "goal": "feature/forms начинается от main и содержит только твои 4 коммита.",
-        "initialStateDisplay": null,
+        "story": "feature/forms по ошибке ответвилась от feature/buttons вместо main — наверное\nпереключился не туда перед git switch -c. Последние 4 коммита в feature/forms\nтвои, чистые — они никак не зависят от feature/buttons. Алёна говорит:\n\"Используй --onto, это ровно для такого сделано.\" Нужно перенести только твои\n4 коммита поверх main, без коммитов из feature/buttons.\n",
+        "goal": "Перебазировать feature/forms поверх main, исключив коммиты feature/buttons.",
+        "initialStateDisplay": {
+          "branches": [
+            {
+              "name": "main",
+              "commits": [
+                "A",
+                "B"
+              ]
+            },
+            {
+              "name": "feature/buttons",
+              "commits": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            {
+              "name": "feature/forms",
+              "commits": [
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H"
+              ]
+            }
+          ],
+          "note": "E-H — твои коммиты, C-D — из feature/buttons"
+        },
         "bank": {
           "commands": [
             "rebase"
@@ -836,11 +1027,6 @@
           ]
         },
         "bankChips": [
-          "git rebase",
-          "--onto",
-          "main",
-          "feature/buttons",
-          "feature/forms",
           "git rebase --onto main feature/buttons feature/forms",
           "git rebase main",
           "git reset --hard main"
@@ -868,25 +1054,35 @@
                 "flag": "--onto"
               },
               "points": 2,
-              "reason": "--onto — элегантный перенос диапазона"
+              "reason": "--onto — точный перенос диапазона коммитов"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "--onto <new> <old> <branch>: перенести коммиты с <old>..<branch> поверх <new>."
+          "--onto <new-base> <old-base> <branch>: перенести коммиты с old-base..branch поверх new-base."
         ]
       },
       "knowledge": {
-        "explanation": "rebase --onto переносит произвольный диапазон поверх произвольной базы.\n",
-        "solutionsCommentary": [],
+        "explanation": "rebase --onto переносит произвольный диапазон поверх произвольной базы.\nСинтаксис: --onto <new> <exclude-upto> <branch>. Коммиты после <exclude-upto> до <branch>\nперекладываются поверх <new>.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "rebase --onto",
+            "commentary": "--onto main feature/buttons feature/forms говорит: \"возьми коммиты feature/forms\nкоторые идут после feature/buttons (то есть только твои E-H), и переложи их поверх main\".\nКоммиты C-D из feature/buttons не попадают. Это ровно тот случай для которого --onto\nи придуман — перенос поддиапазона без ручного cherry-pick.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "rebase-onto-deep",
           "cherry-pick-range"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-rebase(1)",
+            "url": "https://git-scm.com/docs/git-rebase"
+          }
+        ]
       }
     },
     {
@@ -896,16 +1092,18 @@
       "points": 7,
       "maxCommands": 3,
       "inGame": {
-        "story": "Hash коммита-фикса fix555 должен быть в release/3.1, release/3.2, release/3.3.\n",
-        "goal": "Список веток с коммитом.",
+        "story": "Егор сделал hotfix-коммит fix555 и сказал что он должен быть в release/3.1,\nrelease/3.2 и release/3.3 — через cherry-pick поверх каждого релиза.\nQA спрашивает: в какие ветки коммит реально попал? Проверять каждую ветку\nвручную через git log долго, а релизных веток у вас ещё с десяток.\n",
+        "goal": "Найти все ветки, в которых есть коммит fix555.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
-            "branch"
+            "branch",
+            "log"
           ],
           "flags": [
             "--contains",
-            "-a"
+            "-a",
+            "-r"
           ],
           "args": [
             "fix555"
@@ -916,16 +1114,14 @@
           ],
           "prebuilt": [
             "git branch --contains fix555",
-            "git branch -a --contains fix555"
+            "git branch -a --contains fix555",
+            "git branch -r --contains fix555"
           ]
         },
         "bankChips": [
-          "git branch",
-          "--contains",
-          "-a",
-          "fix555",
           "git branch --contains fix555",
           "git branch -a --contains fix555",
+          "git branch -r --contains fix555",
           "git log fix555..",
           "git cherry"
         ],
@@ -953,6 +1149,18 @@
                 ]
               }
             ]
+          },
+          {
+            "kind": "long",
+            "label": "branch -r --contains",
+            "sequence": [
+              {
+                "step": "git branch -r --contains fix555",
+                "acceptableVariants": [
+                  "git branch -r --contains fix555"
+                ]
+              }
+            ]
           }
         ],
         "forbiddenCommands": [],
@@ -961,19 +1169,37 @@
           "penalties": []
         },
         "hints": [
-          "branch --contains <hash> покажет ветки с коммитом."
+          "branch --contains <hash> покажет ветки у которых этот коммит — предок HEAD."
         ]
       },
       "knowledge": {
-        "explanation": "--contains <commitish>: ветки, у которых коммит — предок HEAD.\n",
-        "solutionsCommentary": [],
+        "explanation": "--contains <commitish> возвращает ветки у которых коммит является предком.\n-a показывает и локальные, и remote-tracking ветки. -r — только remote.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "branch -a --contains",
+            "commentary": "-a включает remote-tracking ветки (origin/release/3.1 и т.д.) — это полная картина.\nКогда нужно проверить cherry-pick по нескольким релизным веткам, -a даст ответ\nодной командой без переключения между ветками.\n"
+          },
+          {
+            "solutionLabel": "branch --contains",
+            "commentary": "Без флагов показывает только локальные ветки. Работает если все релизные ветки\nспулены локально. Если cherry-pick делали и пушили не заходя локально — результат\nбудет неполным.\n"
+          },
+          {
+            "solutionLabel": "branch -r --contains",
+            "commentary": "-r — только remote-tracking ветки. Полезно когда нет локальных копий релизных веток\nи не хочется их создавать. Покажет origin/release/3.x без fetch.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "branch-contains",
           "cherry-tool"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-branch(1)",
+            "url": "https://git-scm.com/docs/git-branch"
+          }
+        ]
       }
     },
     {
@@ -983,8 +1209,8 @@
       "points": 7,
       "maxCommands": 1,
       "inGame": {
-        "story": "Сделал git reset --hard HEAD~10, ошибся веткой. Других операций не было.\n10 коммитов исчезли.\n",
-        "goal": "Вернуть ветку одной командой.",
+        "story": "Дарина рядом говорила про HEAD~1, ты машинально написал HEAD~10 — опечатка на одну цифру.\nХотел откатить один экспериментальный коммит, откатил десять.\nДругих операций с тех пор не было — только этот один reset.\nmaxCommands: 1 — нужно вернуться одной командой, без reflog.\n",
+        "goal": "Вернуть ветку в состояние до reset одной командой.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -1007,10 +1233,6 @@
           ]
         },
         "bankChips": [
-          "git reset",
-          "--hard",
-          "ORIG_HEAD",
-          "HEAD@{1}",
           "git reset --hard ORIG_HEAD",
           "git reset --hard HEAD@{1}",
           "git reflog",
@@ -1051,18 +1273,27 @@
                 "arg": "ORIG_HEAD"
               },
               "points": 2,
-              "reason": "ORIG_HEAD — минимальный путь"
+              "reason": "ORIG_HEAD — самый прямой путь"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "ORIG_HEAD автоматически выставляется reset/merge/rebase."
+          "ORIG_HEAD автоматически выставляется перед reset, merge, rebase."
         ]
       },
       "knowledge": {
-        "explanation": "Внутри maxCommands=1 единственно реальный путь — ORIG_HEAD или HEAD@{1}.\n",
-        "solutionsCommentary": [],
+        "explanation": "При maxCommands=1 единственный путь — знать ORIG_HEAD или HEAD@{1}.\nORIG_HEAD выставляется reset/merge/rebase перед опасной операцией.\nHEAD@{1} — предыдущая позиция HEAD в reflog.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "reset --hard ORIG_HEAD",
+            "commentary": "ORIG_HEAD — специальный ref, который git выставляет перед reset, merge, rebase.\nПока не было других опасных операций, он точно указывает на коммит до сброса.\nСамый прямой путь: одна команда, никакого reflog.\n"
+          },
+          {
+            "solutionLabel": "reset --hard HEAD@{1}",
+            "commentary": "HEAD@{1} — предыдущая позиция HEAD в reflog. Работает так же как ORIG_HEAD в данном\nслучае, но является записью reflog, а не специальным ref. Чуть менее явный, зато\nработает и в ситуациях когда ORIG_HEAD уже перезаписан другой операцией.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -1070,7 +1301,12 @@
           "orig-head-when-set",
           "head-history-syntax"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-reset(1)",
+            "url": "https://git-scm.com/docs/git-reset"
+          }
+        ]
       }
     },
     {
@@ -1080,8 +1316,8 @@
       "points": 1,
       "maxCommands": 7,
       "inGame": {
-        "story": "Ты переписываешь Button.module.css, ничего не закоммичено.\nПрилетает срочный hotfix в main — у клиента в проде белый текст на белом фоне.\n",
-        "goal": "Уйти на main, починить (один коммит), вернуться, продолжить работу.",
+        "story": "Ты переписываешь Button.module.css, ничего не закоммичено.\nРома пишет в Slack: \"Срочно! У клиента в проде белый текст на белом фоне — hotfix нужен прямо сейчас.\"\nПереключиться надо немедленно, а незакоммиченное бросать страшно — там час работы.\nГлавное: вернуться и продолжить с того же места.\n",
+        "goal": "Уйти на main, сделать hotfix-коммит, вернуться в свою ветку и восстановить работу.",
         "initialStateDisplay": {
           "branchLabel": "feature/button",
           "commits": [
@@ -1097,8 +1333,7 @@
             "stash",
             "switch",
             "commit",
-            "add",
-            "pop"
+            "add"
           ],
           "flags": [
             "-m",
@@ -1108,7 +1343,8 @@
             "main",
             "-",
             "feature/button",
-            "\"fix: white-on-white\""
+            "\"fix: white-on-white\"",
+            "\"wip\""
           ],
           "decoys": [
             "git stash drop",
@@ -1129,17 +1365,6 @@
           ]
         },
         "bankChips": [
-          "git stash",
-          "git switch",
-          "git commit",
-          "git add",
-          "git pop",
-          "-m",
-          "-am",
-          "main",
-          "-",
-          "feature/button",
-          "\"fix: white-on-white\"",
           "git stash",
           "git stash pop",
           "git switch main",
@@ -1181,7 +1406,7 @@
                 "step": "git switch -",
                 "acceptableVariants": [
                   "git switch -",
-                  "git switch feature/button"
+                  "git checkout -"
                 ]
               },
               {
@@ -1289,15 +1514,15 @@
         "solutionsCommentary": [
           {
             "solutionLabel": "stash + switch - + pop",
-            "commentary": "Короткая форма: switch - возвращает на предыдущую ветку без указания имени.\n"
+            "commentary": "switch - возвращает на предыдущую ветку без указания имени — идеальный вариант,\nкогда ты только что ушёл и хочешь вернуться. Это отдельная стратегия: ты не указываешь\nимя ветки явно, а пользуешься ярлыком \"предыдущая\".\n"
           },
           {
             "solutionLabel": "stash + явный switch + pop",
-            "commentary": "То же самое, но с явным именем ветки — типичное middle-решение.\n"
+            "commentary": "То же самое, но с явным именем ветки. Работает так же надёжно, просто немного\nдлиннее — зато без загадок, если забыл как называется та ветка.\n"
           },
           {
             "solutionLabel": "wip-коммит вместо stash",
-            "commentary": "Длиннее и грязнее: создаёт мусорный коммит, потом его откатывает.\n"
+            "commentary": "Создаёт мусорный wip-коммит и потом его откатывает. Проверенная \"дедовщина\":\nработает, но засоряет историю и требует лишних шагов.\n"
           }
         ],
         "extraPatterns": [],
@@ -1331,14 +1556,18 @@
       "points": 1,
       "maxCommands": 5,
       "inGame": {
-        "story": "По привычке закоммитил правку tokens.css прямо в main локально. Ещё не пушил.\nМарк увидит — убьёт.\n",
+        "story": "По привычке написал git commit прямо в main, забыв переключиться на свою ветку.\nВ коммите — правка tokens.css, которая ни разу не должна быть в main.\nЕлена смотрит git log перед каждым PR-аппрувом, и это она точно заметит.\nХорошо, что ещё не пушил.\n",
         "goal": "Перенести коммит в новую ветку feature/tokens, main оставить чистой.",
         "initialStateDisplay": {
           "branchLabel": "main",
           "commits": [
             {
+              "hash": "c0",
+              "message": "chore: update deps"
+            },
+            {
               "hash": "c1",
-              "message": "tokens.css tweak"
+              "message": "fix tokens.css"
             }
           ],
           "workingTree": "clean"
@@ -1376,17 +1605,6 @@
           ]
         },
         "bankChips": [
-          "git branch",
-          "git reset",
-          "git switch",
-          "git checkout",
-          "--hard",
-          "--soft",
-          "--mixed",
-          "-b",
-          "HEAD~1",
-          "feature/tokens",
-          "main",
           "git branch feature/tokens",
           "git reset --hard HEAD~1",
           "git reset --soft HEAD~1",
@@ -1470,11 +1688,11 @@
         "solutionsCommentary": [
           {
             "solutionLabel": "branch + reset --hard + switch",
-            "commentary": "Минимальный путь: branch фиксирует HEAD в новой ветке, reset --hard\nбезопасно сдвигает main назад.\n"
+            "commentary": "Минимальный путь: branch фиксирует HEAD в новой ветке, reset --hard безопасно\nсдвигает main назад. reset --soft здесь ловушка — оставит изменения в индексе main.\n"
           },
           {
             "solutionLabel": "checkout -b + back to main + reset",
-            "commentary": "Дольше, но классика. checkout -b сразу переключает, потом возвращаемся.\n"
+            "commentary": "Классика: checkout -b сразу переключает на новую ветку, потом возвращаемся в main\nи откатываем. Длиннее, но понятнее — каждый шаг очевиден.\n"
           }
         ],
         "extraPatterns": [],
@@ -1502,7 +1720,7 @@
       "points": 1,
       "maxCommands": 3,
       "inGame": {
-        "story": "Закоммитил \"fix buton hover state\". Не пушил. Марк всё ещё смотрит.\n",
+        "story": "Закоммитил правку ховера в кнопке и написал \"fix buton hover state\" — без второй t.\nЕщё не пушил, так что исправить реально. Елена всё равно прочитает лог перед аппрувом,\nи такое она точно прокомментирует.\n",
         "goal": "Исправить сообщение последнего коммита.",
         "initialStateDisplay": null,
         "bank": {
@@ -1531,15 +1749,6 @@
           ]
         },
         "bankChips": [
-          "git commit",
-          "git rebase",
-          "git reset",
-          "--amend",
-          "--soft",
-          "-i",
-          "-m",
-          "\"fix button hover state\"",
-          "HEAD~1",
           "git commit --amend -m \"fix button hover state\"",
           "git reset --soft HEAD~1",
           "git commit -m \"fix button hover state\"",
@@ -1587,11 +1796,15 @@
         ]
       },
       "knowledge": {
-        "explanation": "git commit --amend заменяет HEAD-коммит. После push требует --force-with-lease.\n",
+        "explanation": "git commit --amend заменяет HEAD-коммит. Если коммит уже запушен — после amend нужен\n--force-with-lease. Тут не пушили, так что всё чисто.\n",
         "solutionsCommentary": [
           {
             "solutionLabel": "amend одной командой",
-            "commentary": "Самый короткий путь."
+            "commentary": "Самый короткий путь: --amend заменяет последний коммит новым. С -m не нужно\nоткрывать редактор — просто передаёшь исправленное сообщение прямо в команде.\n"
+          },
+          {
+            "solutionLabel": "reset --soft + новый коммит",
+            "commentary": "Длиннее, но понятнее: reset --soft откатывает коммит, оставляя изменения в индексе,\nзатем делаешь новый коммит с правильным сообщением. Вариант для тех, кто не знает --amend.\n"
           }
         ],
         "extraPatterns": [],
@@ -1615,8 +1828,8 @@
       "points": 1,
       "maxCommands": 3,
       "inGame": {
-        "story": "Закоммитил рефакторинг \"extract mixins\", забыл src/styles/_mixins.scss. Не пушил.\n",
-        "goal": "Добавить файл в тот же коммит, не создавая новый.",
+        "story": "Сделал коммит \"refactor: extract mixins\" — и только потом заметил, что забыл\nдобавить сам файл src/styles/_mixins.scss. Он лежит в рабочей директории,\nно в коммит не попал. Ещё не пушил, Рома ещё не смотрел.\n",
+        "goal": "Добавить пропущенный файл в тот же коммит, не создавая новый.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -1643,12 +1856,6 @@
           ]
         },
         "bankChips": [
-          "git add",
-          "git commit",
-          "--amend",
-          "--no-edit",
-          "-m",
-          "src/styles/_mixins.scss",
           "git add src/styles/_mixins.scss",
           "git commit --amend --no-edit",
           "git commit --amend",
@@ -1704,14 +1911,28 @@
         ]
       },
       "knowledge": {
-        "explanation": "--amend --no-edit добавляет staged-изменения к HEAD без редактирования сообщения.\n",
-        "solutionsCommentary": [],
+        "explanation": "--amend --no-edit добавляет staged-изменения к HEAD без редактирования сообщения.\nБез --no-edit откроется редактор — можно случайно поменять сообщение.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "add + amend --no-edit",
+            "commentary": "--no-edit сохраняет текущее сообщение коммита без открытия редактора.\nИдеально когда хочешь просто дополнить коммит без лишних шагов.\n"
+          },
+          {
+            "solutionLabel": "add + amend",
+            "commentary": "То же самое, но без --no-edit откроется редактор с текущим сообщением.\nДольше, зато можно заодно уточнить формулировку если нужно.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "amend-pitfalls"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-commit(1)",
+            "url": "https://git-scm.com/docs/git-commit"
+          }
+        ]
       }
     },
     {
@@ -1721,8 +1942,8 @@
       "points": 1,
       "maxCommands": 2,
       "inGame": {
-        "story": "В feature/dark-mode наэкспериментировал в variables.css, всё поехало.\nВернуть только этот файл к версии из main. Остальные изменения в ветке сохранить.\n",
-        "goal": "Восстановить один файл из другой ветки, не трогая остальные правки.",
+        "story": "В ветке feature/dark-mode ты неделю экспериментировал с variables.css — переменные,\nцвета, отступы. В итоге что-то пошло не так: вся раскладка поехала.\nАлёна говорит: \"Верни variables.css к тому, что в main, остальное не трогай.\"\nПереключаться на main и мержить нельзя — там своих изменений ещё на три дня.\n",
+        "goal": "Восстановить только src/styles/variables.css до версии из main, не трогая другие файлы.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -1751,14 +1972,6 @@
           ]
         },
         "bankChips": [
-          "git checkout",
-          "git restore",
-          "git reset",
-          "git show",
-          "--source=main",
-          "--",
-          "main",
-          "src/styles/variables.css",
           "git restore --source=main src/styles/variables.css",
           "git checkout main -- src/styles/variables.css",
           "git checkout main",
@@ -1814,8 +2027,17 @@
         ]
       },
       "knowledge": {
-        "explanation": "git restore --source=<ref> <path> — современный способ заменить файл версией из ref.\nБез `--`/`-- path` checkout main переключит всю рабочую ветку.\n",
-        "solutionsCommentary": [],
+        "explanation": "git restore --source=<ref> <path> — современный способ заменить файл версией из ref.\ngit checkout без -- <path> переключит всю ветку — запрещено в этой задаче.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "restore --source",
+            "commentary": "Современный синтаксис: restore с --source явно говорит \"возьми файл из этого ref\".\nНе переключает ветку, не трогает другие файлы — именно то, что нужно.\n"
+          },
+          {
+            "solutionLabel": "checkout -- path",
+            "commentary": "Старый способ через checkout с двойным тире. Работает так же, но --source\nчитается однозначнее. Опасность: без тире checkout main переключит ветку целиком.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [
           {
@@ -1843,8 +2065,8 @@
       "points": 3,
       "maxCommands": 4,
       "inGame": {
-        "story": "В main запушен срочный фикс :focus-visible (hash a1b2c3d).\nВ feature/forms он нужен сейчас. Мержить main целиком нельзя.\n",
-        "goal": "Перенести один коммит из main в текущую ветку, разрешить конфликт.",
+        "story": "Рома только что запушил в main срочный фикс :focus-visible (хэш a1b2c3d) —\nкнопки в Safari перестали реагировать на клавиатуру, баг критичный.\nТы сидишь в feature/forms, где этот компонент тоже используется.\nМержить main целиком нельзя — там Ромины незаконченные правки компоновки,\nкоторые сломают твою верстку. Нужен только этот один коммит.\n",
+        "goal": "Перенести коммит a1b2c3d из main в текущую ветку, разрешить конфликт.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -1882,20 +2104,6 @@
           ]
         },
         "bankChips": [
-          "git cherry-pick",
-          "git add",
-          "git merge",
-          "git rebase",
-          "git commit",
-          "--continue",
-          "--abort",
-          "-n",
-          "-x",
-          "-m",
-          "a1b2c3d",
-          "main",
-          "src/components/forms.css",
-          "\"chore: focus-visible\"",
           "git cherry-pick a1b2c3d",
           "git cherry-pick -x a1b2c3d",
           "git cherry-pick -n a1b2c3d",
@@ -1992,7 +2200,7 @@
                 "flag": "-x"
               },
               "points": 1,
-              "reason": "-x записывает исходный hash в сообщение"
+              "reason": "-x записывает исходный hash в сообщение коммита"
             }
           ],
           "penalties": []
@@ -2002,8 +2210,21 @@
         ]
       },
       "knowledge": {
-        "explanation": "cherry-pick переносит конкретный коммит в текущую ветку. Флаг -x добавляет в сообщение\nссылку на оригинальный коммит — полезно для аудита.\n",
-        "solutionsCommentary": [],
+        "explanation": "cherry-pick переносит конкретный коммит в текущую ветку. Флаг -x добавляет в сообщение\nссылку на оригинальный коммит — полезно для аудита: сразу видно откуда взято.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "cherry-pick -x + resolve + continue",
+            "commentary": "-x дописывает в конец сообщения \"(cherry picked from commit a1b2c3d)\" —\nудобно когда потом разбираешься в истории и хочешь понять откуда этот коммит.\nЧуть длиннее флага, зато аудит-след бесплатный.\n"
+          },
+          {
+            "solutionLabel": "cherry-pick + continue",
+            "commentary": "Стандартный cherry-pick без -x. Конфликт разрешаешь вручную, потом --continue\nзавершает операцию. Рабочий вариант, просто без ссылки на источник.\n"
+          },
+          {
+            "solutionLabel": "cherry-pick -n + ручной commit",
+            "commentary": "-n (--no-commit) применяет изменения без авто-коммита. Даёт контроль над сообщением,\nно требует явного commit в конце. Полезно когда хочешь отредактировать сообщение.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -2025,8 +2246,8 @@
       "points": 3,
       "maxCommands": 5,
       "inGame": {
-        "story": "Создал ветку fix-stuff, понял что должно быть fix/header-z-index.\nУже запушил, есть PR, но никто другой её не пуллил.\n",
-        "goal": "Переименовать локально и на remote, удалить старую.",
+        "story": "Создал ветку fix-stuff и запушил её — хотел быстро набросать фикс z-index у хедера.\nПотом посмотрел на название и понял: по командной конвенции должно быть fix/header-z-index.\nPR уже открыт, но Елена ещё не смотрела. Никто другой ветку не пуллил — окно для переименования есть.\n",
+        "goal": "Переименовать ветку локально и на remote, удалить старую remote-ветку.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2055,14 +2276,6 @@
           ]
         },
         "bankChips": [
-          "git branch",
-          "git push",
-          "-m",
-          "--delete",
-          "-u",
-          "fix-stuff",
-          "fix/header-z-index",
-          "origin",
           "git branch -m fix-stuff fix/header-z-index",
           "git push origin -u fix/header-z-index",
           "git push origin --delete fix-stuff",
@@ -2104,19 +2317,34 @@
           "penalties": []
         },
         "hints": [
-          "branch -m переименовывает локально. Remote-tracking надо настроить заново через push -u."
+          "branch -m переименовывает локально. Remote-tracking надо настроить заново через push -u.",
+          "Старую ветку на remote надо удалить отдельно — переименования на remote не существует."
         ]
       },
       "knowledge": {
-        "explanation": "На remote нельзя «переименовать» ветку — только запушить новую и удалить старую.\n",
-        "solutionsCommentary": [],
+        "explanation": "На remote нельзя «переименовать» ветку — только запушить новую и удалить старую.\nbranch -m меняет только локальное имя, remote не знает об этом.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "branch -m + push -u + push --delete",
+            "commentary": "Три шага: переименовать локально, запушить новое имя с -u (настроить tracking),\nудалить старое на remote. Порядок важен — сначала push нового, потом delete старого,\nиначе на время останешься без remote-ветки и PR сломается.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "push-autosetup",
           "branch-move-mechanics"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-branch(1)",
+            "url": "https://git-scm.com/docs/git-branch"
+          },
+          {
+            "title": "git-push(1)",
+            "url": "https://git-scm.com/docs/git-push"
+          }
+        ]
       }
     },
     {
@@ -2126,9 +2354,26 @@
       "points": 3,
       "maxCommands": 6,
       "inGame": {
-        "story": "Три коммита: \"wip\", \"wip 2\", \"finally works\".\nМарк требует один осмысленный коммит перед PR.\n",
-        "goal": "Схлопнуть три коммита в один с нормальным сообщением.",
-        "initialStateDisplay": null,
+        "story": "Три дня работал над вариантами кнопки, коммитил как придётся: \"wip\", \"wip 2\", \"finally works\".\nТеперь пора открывать PR. Елена смотрит git log очень внимательно и уже писала\nчто WIP-коммиты в feature-ветках — это не окей. Нужен один чистый коммит с нормальным сообщением.\n",
+        "goal": "Схлопнуть три последних коммита в один с осмысленным сообщением.",
+        "initialStateDisplay": {
+          "branchLabel": "feature/button-variants",
+          "commits": [
+            {
+              "hash": "c1",
+              "message": "wip"
+            },
+            {
+              "hash": "c2",
+              "message": "wip 2"
+            },
+            {
+              "hash": "c3",
+              "message": "finally works"
+            }
+          ],
+          "workingTree": "clean"
+        },
         "bank": {
           "commands": [
             "rebase",
@@ -2152,21 +2397,15 @@
           "prebuilt": [
             "git reset --soft HEAD~3",
             "git commit -m \"feat: implement button variants\"",
-            "git rebase -i HEAD~3"
+            "git rebase -i HEAD~3",
+            "git rebase --interactive HEAD~3"
           ]
         },
         "bankChips": [
-          "git rebase",
-          "git reset",
-          "git commit",
-          "-i",
-          "--soft",
-          "-m",
-          "HEAD~3",
-          "\"feat: implement button variants\"",
           "git reset --soft HEAD~3",
           "git commit -m \"feat: implement button variants\"",
           "git rebase -i HEAD~3",
+          "git rebase --interactive HEAD~3",
           "git merge --squash",
           "git commit --amend",
           "git reset --hard HEAD~3"
@@ -2219,7 +2458,11 @@
         "solutionsCommentary": [
           {
             "solutionLabel": "reset --soft + commit",
-            "commentary": "Самый короткий путь полного squash."
+            "commentary": "Самый короткий путь когда нужно схлопнуть всё в один коммит: --soft оставляет\nизменения в индексе, дальше просто коммитишь с нормальным сообщением.\nНе даёт контроля над отдельными коммитами, зато минимально и быстро.\n"
+          },
+          {
+            "solutionLabel": "interactive rebase",
+            "commentary": "rebase -i открывает редактор со списком коммитов — можно пометить часть как\nsquash или fixup, часть оставить, часть переименовать. Длиннее reset --soft,\nно незаменимо когда нужно схлопнуть не все, а выборочные коммиты.\n"
           }
         ],
         "extraPatterns": [],
@@ -2238,6 +2481,10 @@
           {
             "title": "git-rebase(1)",
             "url": "https://git-scm.com/docs/git-rebase"
+          },
+          {
+            "title": "git-reset(1)",
+            "url": "https://git-scm.com/docs/git-reset"
           }
         ]
       }
@@ -2249,8 +2496,8 @@
       "points": 3,
       "maxCommands": 3,
       "inGame": {
-        "story": "Соня запушила в main коммит (hash bad1234), ломающий сборку Storybook.\nИстория запулена всеми.\n",
-        "goal": "Отменить эффект коммита, не переписывая историю.",
+        "story": "Петя \"быстро поправил\" CSS в main и запушил коммит bad1234 — сборка Storybook\nсразу упала, потому что он случайно удалил импорт темы. История уже спулена всей командой.\nЕлена в отпуске, но написала что revert одобрит. Переписывать историю нельзя —\nу всех четверых уже эти коммиты локально.\n",
+        "goal": "Отменить эффект коммита bad1234, не переписывая историю.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2281,17 +2528,6 @@
           ]
         },
         "bankChips": [
-          "git revert",
-          "git reset",
-          "git push",
-          "--hard",
-          "--force",
-          "--force-with-lease",
-          "--no-edit",
-          "bad1234",
-          "HEAD~1",
-          "origin",
-          "main",
           "git revert bad1234",
           "git revert --no-edit bad1234",
           "git push",
@@ -2301,12 +2537,12 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "revert + push",
+            "label": "revert --no-edit + push",
             "sequence": [
               {
-                "step": "git revert bad1234",
+                "step": "git revert --no-edit bad1234",
                 "acceptableVariants": [
-                  "git revert bad1234"
+                  "git revert --no-edit bad1234"
                 ]
               },
               {
@@ -2319,12 +2555,12 @@
           },
           {
             "kind": "standard",
-            "label": "revert --no-edit + push",
+            "label": "revert + push",
             "sequence": [
               {
-                "step": "git revert --no-edit bad1234",
+                "step": "git revert bad1234",
                 "acceptableVariants": [
-                  "git revert --no-edit bad1234"
+                  "git revert bad1234"
                 ]
               },
               {
@@ -2349,8 +2585,17 @@
         ]
       },
       "knowledge": {
-        "explanation": "Shared-история ≠ право на rewrite. revert безопасен для пушенных коммитов.\n",
-        "solutionsCommentary": [],
+        "explanation": "Shared-история — не право на rewrite. revert безопасен для пушенных коммитов:\nсоздаёт новый коммит, отменяющий изменения, без переписывания существующих.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "revert --no-edit + push",
+            "commentary": "--no-edit пропускает открытие редактора — git использует дефолтное сообщение\n\"Revert ...\". Быстрее, когда сообщение не важно и нужно просто откатить быстро.\n"
+          },
+          {
+            "solutionLabel": "revert + push",
+            "commentary": "Без --no-edit откроется редактор, можно добавить контекст: почему откатываешь,\nссылку на тикет. Полезно для аудит-трейла в командном репо.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -2372,9 +2617,18 @@
       "points": 3,
       "maxCommands": 4,
       "inGame": {
-        "story": "Соня сделала git reset --hard HEAD~5, потеряла 5 коммитов работы над модалкой.\nНе пушила. Плачет.\n",
-        "goal": "Восстановить ветку на потерянный коммит.",
-        "initialStateDisplay": null,
+        "story": "Дарина хотела откатить один экспериментальный коммит в ветке feature/modal,\nно написала git reset --hard HEAD~5 вместо HEAD~1. Пять коммитов работы над\nмодалкой исчезли. Не пушила — на remote их нет. Пришла к тебе за помощью.\n",
+        "goal": "Восстановить ветку на коммит до неудачного reset.",
+        "initialStateDisplay": {
+          "branchLabel": "feature/modal",
+          "commits": [
+            {
+              "hash": "c0",
+              "message": "feat: modal base"
+            }
+          ],
+          "workingTree": "clean (5 коммитов потеряны)"
+        },
         "bank": {
           "commands": [
             "reflog",
@@ -2404,14 +2658,6 @@
           ]
         },
         "bankChips": [
-          "git reflog",
-          "git reset",
-          "git branch",
-          "--hard",
-          "ORIG_HEAD",
-          "HEAD@{1}",
-          "deadbee",
-          "recovery",
           "git reset --hard ORIG_HEAD",
           "git reset --hard HEAD@{1}",
           "git reflog",
@@ -2486,19 +2732,32 @@
                 "arg": "ORIG_HEAD"
               },
               "points": 1,
-              "reason": "ORIG_HEAD — короткий путь"
+              "reason": "ORIG_HEAD — прямой путь без reflog"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "ORIG_HEAD автоматически выставляется перед опасными операциями.",
-          "reflog показывает все позиции HEAD."
+          "ORIG_HEAD автоматически выставляется перед опасными операциями вроде reset.",
+          "reflog показывает все позиции HEAD — даже после reset --hard."
         ]
       },
       "knowledge": {
-        "explanation": "reset --hard выставляет ORIG_HEAD на предыдущий HEAD. reflog хранит историю позиций.\n",
-        "solutionsCommentary": [],
+        "explanation": "reset --hard выставляет ORIG_HEAD на предыдущий HEAD. reflog хранит историю позиций HEAD\nс временными метками — коммиты живут в reflog до gc/expire (90 дней по умолчанию).\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "reset --hard ORIG_HEAD",
+            "commentary": "Самый короткий путь: ORIG_HEAD автоматически выставляется перед reset, merge, rebase.\nЕсли после reset больше ничего не делали — ORIG_HEAD указывает именно туда, куда нужно.\n"
+          },
+          {
+            "solutionLabel": "reflog + reset",
+            "commentary": "Универсальный метод: reflog показывает всю историю позиций HEAD с хэшами.\nНаходишь нужный коммит по сообщению или времени, делаешь reset --hard на него.\nРаботает даже когда ORIG_HEAD уже перезаписан другой операцией.\n"
+          },
+          {
+            "solutionLabel": "safer recovery branch",
+            "commentary": "Осторожный вариант: сначала создаёшь ветку на нужном коммите, потом reset.\nПолезно когда не уверен в хэше — ветка будет как страховочная сетка.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
@@ -2510,6 +2769,10 @@
           {
             "title": "git-reflog(1)",
             "url": "https://git-scm.com/docs/git-reflog"
+          },
+          {
+            "title": "git-reset(1)",
+            "url": "https://git-scm.com/docs/git-reset"
           }
         ]
       }
@@ -2521,8 +2784,8 @@
       "points": 3,
       "maxCommands": 3,
       "inGame": {
-        "story": "Начал git merge main, 30 конфликтов в CSS, rebase был бы чище.\n",
-        "goal": "Прервать merge, сделать rebase.",
+        "story": "Решил подтянуть main в свою ветку feature/grid через merge — привычка.\nОткрылось 30 конфликтов в CSS-файлах сразу, всё стало красным. Алёна\nпосмотрела и говорит: \"Тут rebase чище будет, история линейнее.\" Нужно\nпрервать текущий merge и сделать rebase вместо него.\n",
+        "goal": "Прервать незавершённый merge и переключиться на rebase main.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2549,13 +2812,6 @@
           ]
         },
         "bankChips": [
-          "git merge",
-          "git rebase",
-          "git reset",
-          "--abort",
-          "--hard",
-          "main",
-          "HEAD",
           "git merge --abort",
           "git reset --hard HEAD",
           "git rebase main",
@@ -2609,25 +2865,43 @@
                 "flag": "--abort"
               },
               "points": 1,
-              "reason": "merge --abort — корректный способ"
+              "reason": "merge --abort корректно подчищает merge-state"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "merge --abort откатывает и очищает state-файлы."
+          "merge --abort откатывает merge и очищает state-файлы."
         ]
       },
       "knowledge": {
-        "explanation": "Во время merge git хранит MERGE_HEAD и MERGE_MSG. merge --abort их подчищает.\n",
-        "solutionsCommentary": [],
+        "explanation": "Во время merge git создаёт MERGE_HEAD и MERGE_MSG в .git/. merge --abort их подчищает\nи возвращает к pre-merge состоянию. reset --hard тоже работает, но грубее.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "merge --abort + rebase",
+            "commentary": "Правильный способ: --abort корректно откатывает merge-состояние, очищает\nMERGE_HEAD и MERGE_MSG. Потом rebase main даёт линейную историю без merge-коммита.\n"
+          },
+          {
+            "solutionLabel": "reset + rebase",
+            "commentary": "reset --hard HEAD тоже работает — откатывает worktree к pre-merge состоянию.\nМенее явный чем --abort, но результат тот же. После него rebase main как обычно.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "merge-state-files",
           "abort-vs-reset"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-merge(1)",
+            "url": "https://git-scm.com/docs/git-merge"
+          },
+          {
+            "title": "git-rebase(1)",
+            "url": "https://git-scm.com/docs/git-rebase"
+          }
+        ]
       }
     },
     {
@@ -2637,8 +2911,8 @@
       "points": 3,
       "maxCommands": 3,
       "inGame": {
-        "story": "Неделю сидишь в feature/grid-system. main ушла на 40 коммитов.\nМарк ненавидит merge-коммиты в feature-ветках.\n",
-        "goal": "Подтянуть изменения, оставив линейную историю.",
+        "story": "Неделю сидишь в feature/grid-system, main за это время ушла на 40 коммитов вперёд.\nНадо подтянуть изменения, но Елена написала в team-guidelines: \"Никаких merge-коммитов\nв feature-ветках — только rebase.\" Привычный git pull создаст merge-коммит,\nкоторый она точно заметит при ревью.\n",
+        "goal": "Подтянуть изменения из main, оставив линейную историю ветки.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2666,14 +2940,6 @@
           ]
         },
         "bankChips": [
-          "git fetch",
-          "git rebase",
-          "git pull",
-          "git merge",
-          "--rebase",
-          "origin",
-          "origin/main",
-          "main",
           "git fetch origin",
           "git rebase origin/main",
           "git pull --rebase origin main",
@@ -2720,19 +2986,37 @@
           "penalties": []
         },
         "hints": [
-          "rebase даёт линейную историю."
+          "rebase перекладывает твои коммиты поверх обновлённого main — без merge-коммита."
         ]
       },
       "knowledge": {
-        "explanation": "pull.rebase=true делает rebase поведением по умолчанию.\n",
-        "solutionsCommentary": [],
+        "explanation": "pull.rebase=true в конфиге делает rebase поведением по умолчанию для pull.\nfetch + rebase — явный двухшаговый вариант, pull --rebase — компактный однострочник.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "fetch + rebase",
+            "commentary": "Двухшаговый вариант: fetch обновляет remote-tracking ветки, rebase перекладывает\nтвои коммиты поверх. Явнее — видно что именно происходит на каждом шаге.\nПредпочтителен когда хочешь посмотреть что пришло до rebase.\n"
+          },
+          {
+            "solutionLabel": "pull --rebase",
+            "commentary": "Компактный однострочник: pull с --rebase делает fetch + rebase за один вызов.\nБыстрее набирать. С pull.rebase=true в конфиге флаг можно не писать вовсе.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "pull-rebase-config",
           "linear-history-philosophy"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-pull(1)",
+            "url": "https://git-scm.com/docs/git-pull"
+          },
+          {
+            "title": "git-rebase(1)",
+            "url": "https://git-scm.com/docs/git-rebase"
+          }
+        ]
       }
     },
     {
@@ -2742,8 +3026,8 @@
       "points": 3,
       "maxCommands": 6,
       "inGame": {
-        "story": "В layout.css два несвязанных изменения — grid в хедере и z-index у модалок.\n",
-        "goal": "Закоммитить раздельно: два коммита с правильным разделением.",
+        "story": "Пока правил layout.css, случайно затронул два разных места: grid-раскладку в хедере\nи z-index у модалок. Изменения несвязанные, коммитить их вместе — плохая практика.\nРома попросил в PR два отдельных коммита с понятными сообщениями.\nОба изменения в одном файле — придётся разбивать.\n",
+        "goal": "Создать два раздельных коммита из одного файла layout.css.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2771,13 +3055,6 @@
           ]
         },
         "bankChips": [
-          "git add",
-          "git commit",
-          "-p",
-          "-m",
-          "layout.css",
-          "\"fix: header grid\"",
-          "\"refactor: modal z-index\"",
           "git add -p layout.css",
           "git commit -m \"fix: header grid\"",
           "git commit -m \"refactor: modal z-index\"",
@@ -2788,7 +3065,7 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "add -p + commit ×2",
+            "label": "add -p + commit x2",
             "sequence": [
               {
                 "step": "git add -p layout.css",
@@ -2823,19 +3100,29 @@
           "penalties": []
         },
         "hints": [
-          "add -p даёт интерактивный выбор hunk'ов."
+          "add -p даёт интерактивный выбор отдельных hunk'ов внутри файла."
         ]
       },
       "knowledge": {
-        "explanation": "add -p позволяет stage'ить отдельные hunks из файла.\n",
-        "solutionsCommentary": [],
+        "explanation": "add -p запускает интерактивный режим выбора hunks: y/n/s/e для каждого куска.\nПозволяет закоммитить только часть изменений файла.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "add -p + commit x2",
+            "commentary": "add -p открывает каждый hunk поочерёдно — выбираешь y (добавить) или n (пропустить).\nПервым проходом берёшь только grid-правки, коммитишь. Вторым — z-index правки.\nСамый контролируемый способ разбить изменения одного файла на несколько коммитов.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "add-patch-mechanics",
           "stash-patch"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-add(1)",
+            "url": "https://git-scm.com/docs/git-add"
+          }
+        ]
       }
     },
     {
@@ -2845,8 +3132,8 @@
       "points": 3,
       "maxCommands": 8,
       "inGame": {
-        "story": "Ревьюишь чужой PR — нужно 5 раз посмотреть-сравнить состояние своей ветки и review/feature-x.\n",
-        "goal": "5 переключений между двумя ветками.",
+        "story": "Рома открыл PR с веткой review/feature-x и попросил посмотреть вживую.\nНужно несколько раз переключиться между своей веткой и его — сравниваешь\nповедение, возвращаешься проверить свой код, снова к нему. Туда-обратно раз пять.\nКаждый раз набирать полное имя ветки утомительно.\n",
+        "goal": "Сделать 5 переключений между своей веткой my-branch и review/feature-x.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2868,10 +3155,6 @@
           ]
         },
         "bankChips": [
-          "git switch",
-          "-",
-          "review/feature-x",
-          "my-branch",
           "git switch review/feature-x",
           "git switch -",
           "git switch my-branch",
@@ -2881,7 +3164,7 @@
         "validSolutions": [
           {
             "kind": "ideal",
-            "label": "5 × switch -",
+            "label": "switch - x4",
             "sequence": [
               {
                 "step": "git switch review/feature-x",
@@ -2914,6 +3197,42 @@
                 ]
               }
             ]
+          },
+          {
+            "kind": "standard",
+            "label": "switch по имени x4",
+            "sequence": [
+              {
+                "step": "git switch review/feature-x",
+                "acceptableVariants": [
+                  "git switch review/feature-x"
+                ]
+              },
+              {
+                "step": "git switch my-branch",
+                "acceptableVariants": [
+                  "git switch my-branch"
+                ]
+              },
+              {
+                "step": "git switch review/feature-x",
+                "acceptableVariants": [
+                  "git switch review/feature-x"
+                ]
+              },
+              {
+                "step": "git switch my-branch",
+                "acceptableVariants": [
+                  "git switch my-branch"
+                ]
+              },
+              {
+                "step": "git switch review/feature-x",
+                "acceptableVariants": [
+                  "git switch review/feature-x"
+                ]
+              }
+            ]
           }
         ],
         "forbiddenCommands": [],
@@ -2925,25 +3244,39 @@
                 "arg": "-"
               },
               "points": 1,
-              "reason": "switch - короче полного имени"
+              "reason": "switch - короче полного имени ветки"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "switch - возвращает на предыдущую ветку."
+          "switch - возвращает на предыдущую ветку без указания имени."
         ]
       },
       "knowledge": {
-        "explanation": "switch - и @{-1} — алиасы предыдущей ветки.\n",
-        "solutionsCommentary": [],
+        "explanation": "switch - и checkout - используют @{-1} — ссылку на предыдущий HEAD.\nПри частых переключениях между двумя ветками экономит время на наборе имён.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "switch - x4",
+            "commentary": "switch - — алиас для \"вернуться на предыдущую ветку\". При чередовании двух веток\nработает как toggle: каждый вызов переключает на ту, с которой только что ушёл.\nКороче и быстрее — не нужно помнить и набирать полное имя.\n"
+          },
+          {
+            "solutionLabel": "switch по имени x4",
+            "commentary": "Явный вариант — каждый раз пишешь полное имя ветки. Работает так же, просто\nдлиннее. Удобно когда переключаешься между тремя и более ветками, где - не поможет.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "switch-dash-aliases",
           "revision-syntax-deep"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-switch(1)",
+            "url": "https://git-scm.com/docs/git-switch"
+          }
+        ]
       }
     },
     {
@@ -2953,8 +3286,8 @@
       "points": 3,
       "maxCommands": 2,
       "inGame": {
-        "story": "Сделал git rebase main на feature/forms, история сломалась.\nРешил половину конфликтов, потом понял что подход неверный.\n--abort уже не вариант (коммит посередине).\n",
-        "goal": "Вернуть ветку в pre-rebase позицию.",
+        "story": "Запустил git rebase main на feature/forms — хотел линейную историю.\nНачал разрешать конфликты, решил половину, а потом понял что подход неверный:\nнужно было сначала поговорить с Алёной о стратегии. git rebase --abort уже\nне поможет — ты уже продвинулся в середину rebase и сделал несколько коммитов.\nНужно вернуться в точку до rebase.\n",
+        "goal": "Вернуть ветку feature/forms в состояние до начала rebase.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -2980,12 +3313,6 @@
           ]
         },
         "bankChips": [
-          "git reset",
-          "git reflog",
-          "--hard",
-          "ORIG_HEAD",
-          "HEAD@{1}",
-          "abc123",
           "git reset --hard ORIG_HEAD",
           "git reset --hard HEAD@{1}",
           "git reflog",
@@ -3033,25 +3360,43 @@
                 "arg": "ORIG_HEAD"
               },
               "points": 2,
-              "reason": "ORIG_HEAD — знание короткого пути"
+              "reason": "ORIG_HEAD — прямой путь без reflog"
             }
           ],
           "penalties": []
         },
         "hints": [
-          "rebase выставляет ORIG_HEAD на pre-rebase позицию."
+          "rebase выставляет ORIG_HEAD на pre-rebase позицию при старте."
         ]
       },
       "knowledge": {
-        "explanation": "ORIG_HEAD выставляется reset, merge, rebase, pull перед опасной операцией.\n",
-        "solutionsCommentary": [],
+        "explanation": "ORIG_HEAD выставляется reset, merge, rebase, pull перед опасной операцией.\nПосле rebase, даже незавершённого, он указывает на коммит до начала операции.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "reset ORIG_HEAD",
+            "commentary": "Одна команда: ORIG_HEAD выставляется в начале rebase и остаётся там, пока\nдругая \"опасная\" операция его не перезапишет. Знание этого спасает\nв ситуациях когда --abort уже не вариант.\n"
+          },
+          {
+            "solutionLabel": "reflog + reset",
+            "commentary": "Универсальный путь: reflog показывает все позиции HEAD с временными метками\nи описанием операции (rebase-start, rebase-pick и т.д.). Находишь строку\nдо начала rebase — берёшь хэш для reset --hard.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "orig-head-when-set",
           "rebase-recovery"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-reflog(1)",
+            "url": "https://git-scm.com/docs/git-reflog"
+          },
+          {
+            "title": "git-reset(1)",
+            "url": "https://git-scm.com/docs/git-reset"
+          }
+        ]
       }
     },
     {
@@ -3061,8 +3406,8 @@
       "points": 3,
       "maxCommands": 2,
       "inGame": {
-        "story": "Витя добавлял/удалял !important в .btn-primary за последний месяц.\nНайти все коммиты, где количество вхождений менялось.\n",
-        "goal": "Запустить правильную команду.",
+        "story": "В styles/button.css снова появился !important в .btn-primary — третий раз за месяц.\nПетя то добавляет его \"временно\", то кто-то убирает, то снова появляется.\nРома говорит: разберись кто и когда — нужно найти все коммиты,\nгде количество вхождений !important в этом файле менялось.\n",
+        "goal": "Найти все коммиты, изменявшие количество вхождений !important в styles/button.css.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -3090,15 +3435,6 @@
           ]
         },
         "bankChips": [
-          "git log",
-          "git blame",
-          "git grep",
-          "-S",
-          "-G",
-          "--grep",
-          "--",
-          "\"!important\"",
-          "styles/button.css",
           "git log -S \"!important\" -- styles/button.css",
           "git log -G \"!important\" -- styles/button.css",
           "git log --grep",
@@ -3136,19 +3472,33 @@
           "penalties": []
         },
         "hints": [
-          "-S ищет изменения количества вхождений; -G — любые изменения совпадающих строк."
+          "-S ищет коммиты, где изменилось число вхождений строки. -G ищет по regex в диффе."
         ]
       },
       "knowledge": {
-        "explanation": "Pickaxe (-S/-G) — search в diff'ах, а не в commit message (как --grep).\n",
-        "solutionsCommentary": [],
+        "explanation": "Pickaxe (-S/-G) — поиск в diff'ах, а не в commit message (как --grep).\n-S находит коммиты где количество вхождений строки изменилось (добавлено или удалено).\n-G находит коммиты где diff содержит строку совпадающую с regex.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "log -S",
+            "commentary": "-S \"строка\" — pickaxe по точному совпадению: показывает коммиты где число вхождений\nэтой строки изменилось. Идеально для \"кто добавил/удалил этот токен\".\nОтличается от --grep который смотрит только в сообщение коммита.\n"
+          },
+          {
+            "solutionLabel": "log -G",
+            "commentary": "-G \"regex\" — поиск в diff'е по регулярному выражению. Находит коммиты где в диффе\nесть строки совпадающие с паттерном — даже если сам токен не добавлялся/удалялся,\nа менялось его окружение. Шире чем -S, иногда даёт лишние результаты.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "pickaxe-vs-grep",
           "log-L-function-history"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-log(1)",
+            "url": "https://git-scm.com/docs/git-log"
+          }
+        ]
       }
     },
     {
@@ -3158,8 +3508,8 @@
       "points": 3,
       "maxCommands": 2,
       "inGame": {
-        "story": "Локально wip-experiment, на remote должна быть feature/experiment-x.\n",
-        "goal": "На remote feature/experiment-x. Локально wip-experiment.",
+        "story": "Неделю прототипировал новую анимацию загрузки в локальной ветке wip-experiment —\nкороткое имя, чтобы не задалбываться при переключениях. Прототип взлетел,\nАлёна сказала: назови по конвенции feature/experiment-x — PR будет выглядеть нормально.\nПереименовывать локально не хочется — три открытых терминала\nс её именем, IDE-сессия. Нужно запушить так, чтобы на remote было правильное имя.\n",
+        "goal": "Запушить ветку на remote под именем feature/experiment-x, локально оставить wip-experiment.",
         "initialStateDisplay": null,
         "bank": {
           "commands": [
@@ -3181,10 +3531,6 @@
           ]
         },
         "bankChips": [
-          "git push",
-          "-u",
-          "origin",
-          "wip-experiment:feature/experiment-x",
           "git push origin wip-experiment:feature/experiment-x",
           "git push -u origin wip-experiment:feature/experiment-x",
           "git branch -m"
@@ -3221,19 +3567,33 @@
           "penalties": []
         },
         "hints": [
-          "Refspec в push: <local>:<remote>."
+          "Refspec в push: <local>:<remote> — локальная ветка слева, remote справа."
         ]
       },
       "knowledge": {
-        "explanation": "push <remote> <local>:<remote_branch> — отправляет под произвольным именем.\n",
-        "solutionsCommentary": [],
+        "explanation": "push <remote> <local>:<remote_branch> — отправляет под произвольным именем.\nЛокальная ветка и remote-ветка могут называться по-разному.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "push refspec",
+            "commentary": "Refspec <local>:<remote> говорит git: \"возьми локальную ветку wip-experiment,\nзапушь её на remote как feature/experiment-x\". Локальное имя не меняется.\nБез -u tracking не настраивается — следующий push нужно делать так же явно.\n"
+          },
+          {
+            "solutionLabel": "push -u refspec",
+            "commentary": "То же самое, но -u настраивает upstream-tracking: после этого git push без аргументов\nбудет знать куда пушить. Удобнее если планируешь пушить эту ветку регулярно.\n"
+          }
+        ],
         "extraPatterns": [],
         "aliases": [],
         "relatedKnowledge": [
           "push-refspec",
           "triangular-workflows"
         ],
-        "externalLinks": []
+        "externalLinks": [
+          {
+            "title": "git-push(1)",
+            "url": "https://git-scm.com/docs/git-push"
+          }
+        ]
       }
     }
   ]

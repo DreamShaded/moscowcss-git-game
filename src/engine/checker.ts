@@ -19,7 +19,7 @@ function stepContainsCommand(step: string, command: string): boolean {
   return s === c || s.startsWith(c + ' ');
 }
 
-function evaluateModifier(m: Modifier, user: string[]): boolean {
+function evaluateModifier(m: Modifier, user: string[], matchedKind?: string): boolean {
   const cond = m.condition;
   switch (cond.type) {
     case 'usesCommand':
@@ -28,10 +28,14 @@ function evaluateModifier(m: Modifier, user: string[]): boolean {
       return cond.flag ? user.some(s => stepIncludes(s, cond.flag!)) : false;
     case 'usesArg':
       return cond.arg ? user.some(s => stepIncludes(s, cond.arg!)) : false;
+    case 'usesAnyOf':
+      return (cond.commands ?? []).some(cmd => user.some(s => normalizeStep(s) === normalizeStep(cmd)));
     case 'avoidsCommand':
       return cond.command ? !user.some(s => stepContainsCommand(s, cond.command!)) : false;
-    case 'lengthAtMost':
+    case 'sequenceLengthAtMost':
       return typeof cond.length === 'number' ? user.length <= cond.length : false;
+    case 'matchesSolutionKind':
+      return cond.kind ? matchedKind === cond.kind : false;
     default:
       return false;
   }
@@ -101,10 +105,10 @@ export function checkSolution(task: Task, raw: string[]): CheckResult {
   const penaltiesApplied: { reason: string; points: number }[] = [];
 
   for (const m of task.inGame.pointsModifiers?.bonuses ?? []) {
-    if (evaluateModifier(m, user)) bonusesApplied.push({ reason: m.reason, points: m.points });
+    if (evaluateModifier(m, user, matched.kind)) bonusesApplied.push({ reason: m.reason, points: m.points });
   }
   for (const m of task.inGame.pointsModifiers?.penalties ?? []) {
-    if (evaluateModifier(m, user)) penaltiesApplied.push({ reason: m.reason, points: m.points });
+    if (evaluateModifier(m, user, matched.kind)) penaltiesApplied.push({ reason: m.reason, points: m.points });
   }
 
   const total =

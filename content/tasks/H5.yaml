@@ -6,12 +6,15 @@ maxCommands: 5
 
 inGame:
   story: |
-    Соня сделала git branch -D feature/animations локально и git push origin --delete.
-    2 недели работы. Никто другой не пуллил.
-  goal: "Восстановить ветку локально и на remote."
+    Дарина решила "почистить" локальные ветки и запустила git branch -D feature/animations,
+    а потом git push origin --delete. Две недели работы над анимациями онбординга
+    — исчезли. Никто другой ветку не пуллил, на remote её больше нет.
+    Пришла с красными глазами — говорит что не пушила последние три дня.
+  goal: "Восстановить ветку feature/animations локально и запушить на remote."
+
   bank:
-    commands: [reflog, branch, push]
-    flags: ["-u"]
+    commands: [reflog, branch, push, fsck]
+    flags: ["--lost-found", "-u"]
     args: ["lost123", "feature/animations", "origin"]
     decoys:
       - "git clone"
@@ -20,6 +23,7 @@ inGame:
       - "git reflog"
       - "git branch feature/animations lost123"
       - "git push -u origin feature/animations"
+      - "git fsck --lost-found"
 
   validSolutions:
     - kind: ideal
@@ -28,14 +32,40 @@ inGame:
         - step: "git reflog"
         - step: "git branch feature/animations lost123"
         - step: "git push -u origin feature/animations"
+    - kind: standard
+      label: "fsck + branch + push"
+      sequence:
+        - step: "git fsck --lost-found"
+        - step: "git branch feature/animations lost123"
+        - step: "git push -u origin feature/animations"
+
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
 
   hints:
-    - "reflog показывает HEAD-историю, даже когда ветка удалена."
+    - "reflog хранит историю позиций HEAD — ветка удалена, но коммиты живы в reflog."
+    - "fsck --lost-found найдёт dangling коммиты, не достижимые из веток."
 
 knowledge:
   explanation: |
-    Удалённая ветка живёт в reflog до gc.
-  solutionsCommentary: []
+    Удалённая ветка — это просто указатель. Коммиты живут в объектном хранилище
+    до gc/prune (90 дней). reflog показывает хэши даже удалённых веток через историю HEAD.
+  solutionsCommentary:
+    - solutionLabel: "reflog + branch + push"
+      commentary: |
+        reflog хранит историю HEAD: все переключения, коммиты, операции. После удаления
+        ветки её последний коммит виден как "checkout: moving from feature/animations to ...".
+        Берёшь хэш, создаёшь ветку — готово. Быстрее fsck для свежих потерь.
+    - solutionLabel: "fsck + branch + push"
+      commentary: |
+        fsck --lost-found находит dangling objects — коммиты, не достижимые ни из одной ветки
+        или тега. Записывает хэши в .git/lost-found/. Медленнее reflog, но работает даже
+        когда reflog уже не помогает (например после gc или давней потери).
   aliases: []
   relatedKnowledge: [reflog-deep, fsck-dangling, gc-timing]
-  externalLinks: []
+  externalLinks:
+    - { title: "git-reflog(1)", url: "https://git-scm.com/docs/git-reflog" }
+    - { title: "git-fsck(1)", url: "https://git-scm.com/docs/git-fsck" }
