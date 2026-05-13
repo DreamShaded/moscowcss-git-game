@@ -1,0 +1,76 @@
+id: L2
+title: "Не туда закоммитил"
+difficulty: easy
+points: 1
+maxCommands: 5
+
+inGame:
+  story: |
+    По привычке закоммитил правку tokens.css прямо в main локально. Ещё не пушил.
+    Марк увидит — убьёт.
+  goal: "Перенести коммит в новую ветку feature/tokens, main оставить чистой."
+  initialStateDisplay:
+    branchLabel: "main"
+    commits:
+      - { hash: c1, message: "tokens.css tweak" }
+    workingTree: "clean"
+
+  bank:
+    commands: [branch, reset, switch, checkout]
+    flags: ["--hard", "--soft", "--mixed", "-b"]
+    args: ["HEAD~1", "feature/tokens", "main"]
+    decoys:
+      - "git revert HEAD"
+      - "git cherry-pick"
+      - "git push --force"
+    prebuilt:
+      - "git branch feature/tokens"
+      - "git reset --hard HEAD~1"
+      - "git reset --soft HEAD~1"
+      - "git switch feature/tokens"
+      - "git switch main"
+      - "git checkout -b feature/tokens"
+
+  validSolutions:
+    - kind: ideal
+      label: "branch + reset --hard + switch"
+      sequence:
+        - step: "git branch feature/tokens"
+        - step: "git reset --hard HEAD~1"
+        - step: "git switch feature/tokens"
+    - kind: long
+      label: "checkout -b + back to main + reset"
+      sequence:
+        - step: "git checkout -b feature/tokens"
+        - step: "git switch main"
+        - step: "git reset --hard HEAD~1"
+        - step: "git switch feature/tokens"
+
+  forbiddenCommands:
+    - "git push --force"
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
+  hints:
+    - "Сначала зафиксируй текущий коммит в новой ветке (можно без переключения)."
+    - "Потом откати main на 1 коммит назад. С флагом аккуратнее — soft оставит правки в индексе."
+
+knowledge:
+  explanation: |
+    Ветка — указатель на коммит. Создаём ветку из текущего HEAD, откатываем main.
+    reset --hard здесь уместен — коммит уже сохранён в новой ветке.
+  solutionsCommentary:
+    - solutionLabel: "branch + reset --hard + switch"
+      commentary: |
+        Минимальный путь: branch фиксирует HEAD в новой ветке, reset --hard
+        безопасно сдвигает main назад.
+    - solutionLabel: "checkout -b + back to main + reset"
+      commentary: |
+        Дольше, но классика. checkout -b сразу переключает, потом возвращаемся.
+  aliases: []
+  relatedKnowledge: [reset-soft-mixed-hard, branch-pointer-semantics]
+  externalLinks:
+    - { title: "git-branch(1)", url: "https://git-scm.com/docs/git-branch" }
+    - { title: "git-reset(1)", url: "https://git-scm.com/docs/git-reset" }

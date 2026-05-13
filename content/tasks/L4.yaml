@@ -1,0 +1,46 @@
+id: L4
+title: "Забыл файл в коммите"
+difficulty: easy
+points: 1
+maxCommands: 3
+
+inGame:
+  story: |
+    Закоммитил рефакторинг "extract mixins", забыл src/styles/_mixins.scss. Не пушил.
+  goal: "Добавить файл в тот же коммит, не создавая новый."
+  bank:
+    commands: [add, commit]
+    flags: ["--amend", "--no-edit", "-m"]
+    args: ["src/styles/_mixins.scss"]
+    decoys:
+      - 'git commit -m "add mixins"'
+      - "git stash"
+      - "git reset"
+    prebuilt:
+      - "git add src/styles/_mixins.scss"
+      - "git commit --amend --no-edit"
+      - "git commit --amend"
+
+  validSolutions:
+    - kind: ideal
+      label: "add + amend --no-edit"
+      sequence:
+        - step: "git add src/styles/_mixins.scss"
+        - step: "git commit --amend --no-edit"
+    - kind: standard
+      label: "add + amend"
+      sequence:
+        - step: "git add src/styles/_mixins.scss"
+        - step: "git commit --amend"
+
+  forbiddenCommands: []
+  hints:
+    - "amend позволяет дополнить последний коммит."
+
+knowledge:
+  explanation: |
+    --amend --no-edit добавляет staged-изменения к HEAD без редактирования сообщения.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [amend-pitfalls]
+  externalLinks: []

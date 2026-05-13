@@ -1,0 +1,58 @@
+id: L5
+title: "Откатить файл к версии в main"
+difficulty: easy
+points: 1
+maxCommands: 2
+
+inGame:
+  story: |
+    В feature/dark-mode наэкспериментировал в variables.css, всё поехало.
+    Вернуть только этот файл к версии из main. Остальные изменения в ветке сохранить.
+  goal: "Восстановить один файл из другой ветки, не трогая остальные правки."
+  bank:
+    commands: [checkout, restore, reset, show]
+    flags: ["--source=main", "--"]
+    args: ["main", "src/styles/variables.css"]
+    decoys:
+      - "git checkout main"
+      - "git reset --hard main"
+      - "git revert"
+      - "git stash"
+    prebuilt:
+      - "git restore --source=main src/styles/variables.css"
+      - "git checkout main -- src/styles/variables.css"
+
+  validSolutions:
+    - kind: ideal
+      label: "restore --source"
+      sequence:
+        - step: "git restore --source=main src/styles/variables.css"
+    - kind: standard
+      label: "checkout -- path"
+      sequence:
+        - step: "git checkout main -- src/styles/variables.css"
+
+  forbiddenCommands:
+    - "git checkout main"
+    - "git reset --hard main"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesCommand, command: "git restore" }
+        points: 1
+        reason: "современный restore вместо checkout"
+    penalties: []
+
+  hints:
+    - "restore умеет тянуть из другой ветки одной командой."
+
+knowledge:
+  explanation: |
+    git restore --source=<ref> <path> — современный способ заменить файл версией из ref.
+    Без `--`/`-- path` checkout main переключит всю рабочую ветку.
+  solutionsCommentary: []
+  aliases:
+    - { from: "git checkout main -- file", to: "git restore --source=main file", note: "Современная альтернатива" }
+  relatedKnowledge: [restore-vs-checkout, git-show-paths]
+  externalLinks:
+    - { title: "git-restore(1)", url: "https://git-scm.com/docs/git-restore" }

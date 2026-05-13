@@ -1,0 +1,42 @@
+id: M8
+title: "Частичный коммит из одного файла"
+difficulty: medium
+points: 3
+maxCommands: 6
+
+inGame:
+  story: |
+    В layout.css два несвязанных изменения — grid в хедере и z-index у модалок.
+  goal: "Закоммитить раздельно: два коммита с правильным разделением."
+  bank:
+    commands: [add, commit]
+    flags: ["-p", "-m"]
+    args: ["layout.css", '"fix: header grid"', '"refactor: modal z-index"']
+    decoys:
+      - "git add layout.css"
+      - "git stash -p"
+      - "git commit --amend"
+    prebuilt:
+      - "git add -p layout.css"
+      - 'git commit -m "fix: header grid"'
+      - 'git commit -m "refactor: modal z-index"'
+
+  validSolutions:
+    - kind: ideal
+      label: "add -p + commit ×2"
+      sequence:
+        - step: "git add -p layout.css"
+        - step: 'git commit -m "fix: header grid"'
+        - step: "git add -p layout.css"
+        - step: 'git commit -m "refactor: modal z-index"'
+
+  hints:
+    - "add -p даёт интерактивный выбор hunk'ов."
+
+knowledge:
+  explanation: |
+    add -p позволяет stage'ить отдельные hunks из файла.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [add-patch-mechanics, stash-patch]
+  externalLinks: []

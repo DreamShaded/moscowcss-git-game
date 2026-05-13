@@ -1,0 +1,3240 @@
+{
+  "tasks": [
+    {
+      "id": "H1",
+      "title": "Bisect охотится на сломанный :hover",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 8,
+      "inGame": {
+        "story": "За 50 коммитов кто-то сломал :hover в Safari. CI зелёный, e2e не покрывает hover.\nСкрипт npm run test:hover возвращает 0/1.\n",
+        "goal": "Найти ломающий коммит автоматически, откатить, выйти из bisect.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "bisect",
+            "revert"
+          ],
+          "flags": [
+            "start",
+            "good",
+            "bad",
+            "run",
+            "reset"
+          ],
+          "args": [
+            "HEAD",
+            "v1.0.0",
+            "npm run test:hover",
+            "found123"
+          ],
+          "decoys": [
+            "git blame",
+            "git log -S"
+          ],
+          "prebuilt": [
+            "git bisect start",
+            "git bisect bad HEAD",
+            "git bisect good v1.0.0",
+            "git bisect run npm run test:hover",
+            "git bisect reset",
+            "git revert found123"
+          ]
+        },
+        "bankChips": [
+          "git bisect",
+          "git revert",
+          "start",
+          "good",
+          "bad",
+          "run",
+          "reset",
+          "HEAD",
+          "v1.0.0",
+          "npm run test:hover",
+          "found123",
+          "git bisect start",
+          "git bisect bad HEAD",
+          "git bisect good v1.0.0",
+          "git bisect run npm run test:hover",
+          "git bisect reset",
+          "git revert found123",
+          "git blame",
+          "git log -S"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "bisect run",
+            "sequence": [
+              {
+                "step": "git bisect start",
+                "acceptableVariants": [
+                  "git bisect start"
+                ]
+              },
+              {
+                "step": "git bisect bad HEAD",
+                "acceptableVariants": [
+                  "git bisect bad HEAD"
+                ]
+              },
+              {
+                "step": "git bisect good v1.0.0",
+                "acceptableVariants": [
+                  "git bisect good v1.0.0"
+                ]
+              },
+              {
+                "step": "git bisect run npm run test:hover",
+                "acceptableVariants": [
+                  "git bisect run npm run test:hover"
+                ]
+              },
+              {
+                "step": "git bisect reset",
+                "acceptableVariants": [
+                  "git bisect reset"
+                ]
+              },
+              {
+                "step": "git revert found123",
+                "acceptableVariants": [
+                  "git revert found123"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "run"
+              },
+              "points": 2,
+              "reason": "автоматизация через bisect run"
+            }
+          ],
+          "penalties": [
+            {
+              "condition": {
+                "type": "avoidsCommand",
+                "command": "git bisect reset"
+              },
+              "points": -1,
+              "reason": "не вышел из bisect"
+            }
+          ]
+        },
+        "hints": [
+          "bisect run автоматизирует binary search через exit code.",
+          "Не забыть bisect reset перед revert."
+        ]
+      },
+      "knowledge": {
+        "explanation": "bisect run <cmd>: 0 = good, 1-127 (кроме 125) = bad, 125 = skip.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "bisect-mechanics",
+          "bisect-run-exit-codes"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-bisect(1)",
+            "url": "https://git-scm.com/docs/git-bisect"
+          }
+        ]
+      }
+    },
+    {
+      "id": "H2",
+      "title": "Rerere против повторяющегося конфликта",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 8,
+      "inGame": {
+        "story": "refactor/css-architecture живёт месяц. Каждую неделю мержишь main,\nи каждый раз одни и те же 12 конфликтов в theme.css.\n",
+        "goal": "Настроить rerere, сделать первый merge с запоминанием.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "config",
+            "merge",
+            "add",
+            "commit"
+          ],
+          "flags": [
+            "--global",
+            "rerere.enabled",
+            "true"
+          ],
+          "args": [
+            "theme.css",
+            "main"
+          ],
+          "decoys": [
+            "git config merge.tool",
+            "git merge -X ours",
+            "git merge -X theirs"
+          ],
+          "prebuilt": [
+            "git config --global rerere.enabled true",
+            "git merge main",
+            "git add theme.css",
+            "git commit"
+          ]
+        },
+        "bankChips": [
+          "git config",
+          "git merge",
+          "git add",
+          "git commit",
+          "--global",
+          "rerere.enabled",
+          "true",
+          "theme.css",
+          "main",
+          "git config --global rerere.enabled true",
+          "git merge main",
+          "git add theme.css",
+          "git commit",
+          "git config merge.tool",
+          "git merge -X ours",
+          "git merge -X theirs"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "config + merge + add + commit",
+            "sequence": [
+              {
+                "step": "git config --global rerere.enabled true",
+                "acceptableVariants": [
+                  "git config --global rerere.enabled true"
+                ]
+              },
+              {
+                "step": "git merge main",
+                "acceptableVariants": [
+                  "git merge main"
+                ]
+              },
+              {
+                "step": "git add theme.css",
+                "acceptableVariants": [
+                  "git add theme.css"
+                ]
+              },
+              {
+                "step": "git commit",
+                "acceptableVariants": [
+                  "git commit"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "--global"
+              },
+              "points": 1,
+              "reason": "глобально — для всех репо"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "rerere = REuse REcorded REsolution."
+        ]
+      },
+      "knowledge": {
+        "explanation": "rerere запоминает resolved-конфликты и применяет автоматически при повторе.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "rerere-internals",
+          "rerere-forget"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H3",
+      "title": "Worktree для параллельной работы",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 6,
+      "inGame": {
+        "story": "На середине рефакторинга в feature/grid, полтора дня незакоммиченной работы.\nПрилетает hotfix. Stash страшно.\n",
+        "goal": "Открыть параллельную копию для hotfix/safari-flex от main, убрать worktree.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "worktree"
+          ],
+          "flags": [
+            "add",
+            "remove",
+            "-b"
+          ],
+          "args": [
+            "../cascadia-hotfix",
+            "hotfix/safari-flex",
+            "main"
+          ],
+          "decoys": [
+            "git stash",
+            "git clone",
+            "git switch -c"
+          ],
+          "prebuilt": [
+            "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main",
+            "git worktree remove ../cascadia-hotfix"
+          ]
+        },
+        "bankChips": [
+          "git worktree",
+          "add",
+          "remove",
+          "-b",
+          "../cascadia-hotfix",
+          "hotfix/safari-flex",
+          "main",
+          "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main",
+          "git worktree remove ../cascadia-hotfix",
+          "git stash",
+          "git clone",
+          "git switch -c"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "worktree add + remove",
+            "sequence": [
+              {
+                "step": "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main",
+                "acceptableVariants": [
+                  "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main"
+                ]
+              },
+              {
+                "step": "git worktree remove ../cascadia-hotfix",
+                "acceptableVariants": [
+                  "git worktree remove ../cascadia-hotfix"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "worktree даёт второй checkout того же репо в другой директории."
+        ]
+      },
+      "knowledge": {
+        "explanation": "worktree — несколько рабочих копий одного .git. Каждая ветка может быть checked out в своём worktree.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "worktree-mechanics",
+          "worktree-vs-clone"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H4",
+      "title": "Filter-repo: вычистить случайный .env",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 5,
+      "inGame": {
+        "story": "Витя 3 месяца назад закоммитил .env с production-ключами.\nПрошёл через 200+ коммитов. Команда оповещена, окно для force-push согласовано.\n",
+        "goal": "Удалить файл из всей истории, force-push на remote.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "filter-repo",
+            "push"
+          ],
+          "flags": [
+            "--path",
+            "--invert-paths",
+            "--force",
+            "--all",
+            "--tags"
+          ],
+          "args": [
+            ".env",
+            "origin"
+          ],
+          "decoys": [
+            "git rm .env",
+            "git reset"
+          ],
+          "prebuilt": [
+            "git filter-repo --path .env --invert-paths",
+            "git push --force --all",
+            "git push --force --tags"
+          ]
+        },
+        "bankChips": [
+          "git filter-repo",
+          "git push",
+          "--path",
+          "--invert-paths",
+          "--force",
+          "--all",
+          "--tags",
+          ".env",
+          "origin",
+          "git filter-repo --path .env --invert-paths",
+          "git push --force --all",
+          "git push --force --tags",
+          "git rm .env",
+          "git reset"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "filter-repo + push all/tags",
+            "sequence": [
+              {
+                "step": "git filter-repo --path .env --invert-paths",
+                "acceptableVariants": [
+                  "git filter-repo --path .env --invert-paths"
+                ]
+              },
+              {
+                "step": "git push --force --all",
+                "acceptableVariants": [
+                  "git push --force --all"
+                ]
+              },
+              {
+                "step": "git push --force --tags",
+                "acceptableVariants": [
+                  "git push --force --tags"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesCommand",
+                "command": "git filter-repo"
+              },
+              "points": 1,
+              "reason": "filter-repo (рекомендован git над filter-branch)"
+            },
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "--tags"
+              },
+              "points": 1,
+              "reason": "не забыл теги"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "filter-repo заменил filter-branch.",
+          "Не забыть пушнуть теги — они отдельно."
+        ]
+      },
+      "knowledge": {
+        "explanation": "git-filter-repo — внешний, но рекомендованный инструмент для переписывания истории.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "filter-repo-vs-branch",
+          "bfg-alternative",
+          "post-rewrite-protocol"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H5",
+      "title": "Восстановление удалённой ветки",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 5,
+      "inGame": {
+        "story": "Соня сделала git branch -D feature/animations локально и git push origin --delete.\n2 недели работы. Никто другой не пуллил.\n",
+        "goal": "Восстановить ветку локально и на remote.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "reflog",
+            "branch",
+            "push"
+          ],
+          "flags": [
+            "-u"
+          ],
+          "args": [
+            "lost123",
+            "feature/animations",
+            "origin"
+          ],
+          "decoys": [
+            "git clone",
+            "git pull"
+          ],
+          "prebuilt": [
+            "git reflog",
+            "git branch feature/animations lost123",
+            "git push -u origin feature/animations"
+          ]
+        },
+        "bankChips": [
+          "git reflog",
+          "git branch",
+          "git push",
+          "-u",
+          "lost123",
+          "feature/animations",
+          "origin",
+          "git reflog",
+          "git branch feature/animations lost123",
+          "git push -u origin feature/animations",
+          "git clone",
+          "git pull"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "reflog + branch + push",
+            "sequence": [
+              {
+                "step": "git reflog",
+                "acceptableVariants": [
+                  "git reflog"
+                ]
+              },
+              {
+                "step": "git branch feature/animations lost123",
+                "acceptableVariants": [
+                  "git branch feature/animations lost123"
+                ]
+              },
+              {
+                "step": "git push -u origin feature/animations",
+                "acceptableVariants": [
+                  "git push -u origin feature/animations"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "reflog показывает HEAD-историю, даже когда ветка удалена."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Удалённая ветка живёт в reflog до gc.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "reflog-deep",
+          "fsck-dangling",
+          "gc-timing"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H6",
+      "title": "Submodule застрял в detached HEAD",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 5,
+      "inGame": {
+        "story": "Дизайн-токены в submodule. Кто-то закоммитил новый pointer,\nно эта версия есть только локально у Леры. CI падает.\n",
+        "goal": "Откатить pointer сабмодуля на предыдущий валидный hash.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "submodule",
+            "checkout",
+            "commit"
+          ],
+          "flags": [
+            "update",
+            "--init",
+            "--recursive",
+            "-m"
+          ],
+          "args": [
+            "design-tokens",
+            "HEAD~1",
+            "\"fix: rollback design-tokens pointer\""
+          ],
+          "decoys": [
+            "git submodule update --remote",
+            "git revert HEAD"
+          ],
+          "prebuilt": [
+            "git checkout HEAD~1 -- design-tokens",
+            "git submodule update --init --recursive",
+            "git commit -m \"fix: rollback design-tokens pointer\""
+          ]
+        },
+        "bankChips": [
+          "git submodule",
+          "git checkout",
+          "git commit",
+          "update",
+          "--init",
+          "--recursive",
+          "-m",
+          "design-tokens",
+          "HEAD~1",
+          "\"fix: rollback design-tokens pointer\"",
+          "git checkout HEAD~1 -- design-tokens",
+          "git submodule update --init --recursive",
+          "git commit -m \"fix: rollback design-tokens pointer\"",
+          "git submodule update --remote",
+          "git revert HEAD"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "checkout pointer + submodule update + commit",
+            "sequence": [
+              {
+                "step": "git checkout HEAD~1 -- design-tokens",
+                "acceptableVariants": [
+                  "git checkout HEAD~1 -- design-tokens"
+                ]
+              },
+              {
+                "step": "git submodule update --init --recursive",
+                "acceptableVariants": [
+                  "git submodule update --init --recursive"
+                ]
+              },
+              {
+                "step": "git commit -m \"fix: rollback design-tokens pointer\"",
+                "acceptableVariants": [
+                  "git commit -m \"fix: rollback design-tokens pointer\""
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git submodule update --remote"
+        ],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "Pointer сабмодуля — это просто gitlink в дереве parent-коммита."
+        ]
+      },
+      "knowledge": {
+        "explanation": "submodule update --init --recursive подтягивает локальный checkout под pointer.\n--remote меняет pointer сам — это часто не то, что нужно.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "submodule-pointer-mechanics",
+          "submodule-remote-flag"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H7",
+      "title": "Запушенная история требует переписывания",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 6,
+      "inGame": {
+        "story": "Ветка develop (shared, 4 человека). Затесался коммит с лицензионно-проблемным шрифтом (bad7).\nВсе четверо уже спулили.\n",
+        "goal": "Переписать историю develop, force-push с safety.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "rebase",
+            "push"
+          ],
+          "flags": [
+            "-i",
+            "--force",
+            "--force-with-lease",
+            "--force-if-includes"
+          ],
+          "args": [
+            "bad7~1",
+            "origin",
+            "develop"
+          ],
+          "decoys": [
+            "git push --force origin develop",
+            "git revert bad7"
+          ],
+          "prebuilt": [
+            "git rebase -i bad7~1",
+            "git push --force-with-lease origin develop",
+            "git push --force-with-lease --force-if-includes origin develop"
+          ]
+        },
+        "bankChips": [
+          "git rebase",
+          "git push",
+          "-i",
+          "--force",
+          "--force-with-lease",
+          "--force-if-includes",
+          "bad7~1",
+          "origin",
+          "develop",
+          "git rebase -i bad7~1",
+          "git push --force-with-lease origin develop",
+          "git push --force-with-lease --force-if-includes origin develop",
+          "git push --force origin develop",
+          "git revert bad7"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "rebase + force-with-lease + if-includes",
+            "sequence": [
+              {
+                "step": "git rebase -i bad7~1",
+                "acceptableVariants": [
+                  "git rebase -i bad7~1"
+                ]
+              },
+              {
+                "step": "git push --force-with-lease --force-if-includes origin develop",
+                "acceptableVariants": [
+                  "git push --force-with-lease --force-if-includes origin develop"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "rebase + force-with-lease",
+            "sequence": [
+              {
+                "step": "git rebase -i bad7~1",
+                "acceptableVariants": [
+                  "git rebase -i bad7~1"
+                ]
+              },
+              {
+                "step": "git push --force-with-lease origin develop",
+                "acceptableVariants": [
+                  "git push --force-with-lease origin develop"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git push --force origin develop"
+        ],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "--force-with-lease"
+              },
+              "points": 2,
+              "reason": "safety force-push"
+            },
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "--force-if-includes"
+              },
+              "points": 1,
+              "reason": "доп. защита от races"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "--force-with-lease проверяет, что remote не ушёл вперёд."
+        ]
+      },
+      "knowledge": {
+        "explanation": "--force-with-lease отказывается перезаписать, если ваш local-ref устарел.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "force-with-lease-vs-force",
+          "post-rewrite-team-protocol"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H8",
+      "title": "Извлечь серию коммитов через --onto",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 4,
+      "inGame": {
+        "story": "feature/forms по ошибке ответвилась от feature/buttons вместо main.\nПоследние 4 коммита — твои, чистые.\n",
+        "goal": "feature/forms начинается от main и содержит только твои 4 коммита.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "rebase"
+          ],
+          "flags": [
+            "--onto"
+          ],
+          "args": [
+            "main",
+            "feature/buttons",
+            "feature/forms"
+          ],
+          "decoys": [
+            "git rebase main",
+            "git reset --hard main"
+          ],
+          "prebuilt": [
+            "git rebase --onto main feature/buttons feature/forms"
+          ]
+        },
+        "bankChips": [
+          "git rebase",
+          "--onto",
+          "main",
+          "feature/buttons",
+          "feature/forms",
+          "git rebase --onto main feature/buttons feature/forms",
+          "git rebase main",
+          "git reset --hard main"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "rebase --onto",
+            "sequence": [
+              {
+                "step": "git rebase --onto main feature/buttons feature/forms",
+                "acceptableVariants": [
+                  "git rebase --onto main feature/buttons feature/forms"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "--onto"
+              },
+              "points": 2,
+              "reason": "--onto — элегантный перенос диапазона"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "--onto <new> <old> <branch>: перенести коммиты с <old>..<branch> поверх <new>."
+        ]
+      },
+      "knowledge": {
+        "explanation": "rebase --onto переносит произвольный диапазон поверх произвольной базы.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "rebase-onto-deep",
+          "cherry-pick-range"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H9",
+      "title": "Найти куда уехал коммит",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 3,
+      "inGame": {
+        "story": "Hash коммита-фикса fix555 должен быть в release/3.1, release/3.2, release/3.3.\n",
+        "goal": "Список веток с коммитом.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "branch"
+          ],
+          "flags": [
+            "--contains",
+            "-a"
+          ],
+          "args": [
+            "fix555"
+          ],
+          "decoys": [
+            "git log fix555..",
+            "git cherry"
+          ],
+          "prebuilt": [
+            "git branch --contains fix555",
+            "git branch -a --contains fix555"
+          ]
+        },
+        "bankChips": [
+          "git branch",
+          "--contains",
+          "-a",
+          "fix555",
+          "git branch --contains fix555",
+          "git branch -a --contains fix555",
+          "git log fix555..",
+          "git cherry"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "branch -a --contains",
+            "sequence": [
+              {
+                "step": "git branch -a --contains fix555",
+                "acceptableVariants": [
+                  "git branch -a --contains fix555"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "branch --contains",
+            "sequence": [
+              {
+                "step": "git branch --contains fix555",
+                "acceptableVariants": [
+                  "git branch --contains fix555"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "branch --contains <hash> покажет ветки с коммитом."
+        ]
+      },
+      "knowledge": {
+        "explanation": "--contains <commitish>: ветки, у которых коммит — предок HEAD.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "branch-contains",
+          "cherry-tool"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "H10",
+      "title": "Восстановить через ORIG_HEAD сразу после reset",
+      "difficulty": "hard",
+      "points": 7,
+      "maxCommands": 1,
+      "inGame": {
+        "story": "Сделал git reset --hard HEAD~10, ошибся веткой. Других операций не было.\n10 коммитов исчезли.\n",
+        "goal": "Вернуть ветку одной командой.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "reset"
+          ],
+          "flags": [
+            "--hard"
+          ],
+          "args": [
+            "ORIG_HEAD",
+            "HEAD@{1}"
+          ],
+          "decoys": [
+            "git reflog",
+            "git revert"
+          ],
+          "prebuilt": [
+            "git reset --hard ORIG_HEAD",
+            "git reset --hard HEAD@{1}"
+          ]
+        },
+        "bankChips": [
+          "git reset",
+          "--hard",
+          "ORIG_HEAD",
+          "HEAD@{1}",
+          "git reset --hard ORIG_HEAD",
+          "git reset --hard HEAD@{1}",
+          "git reflog",
+          "git revert"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "reset --hard ORIG_HEAD",
+            "sequence": [
+              {
+                "step": "git reset --hard ORIG_HEAD",
+                "acceptableVariants": [
+                  "git reset --hard ORIG_HEAD"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "reset --hard HEAD@{1}",
+            "sequence": [
+              {
+                "step": "git reset --hard HEAD@{1}",
+                "acceptableVariants": [
+                  "git reset --hard HEAD@{1}"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesArg",
+                "arg": "ORIG_HEAD"
+              },
+              "points": 2,
+              "reason": "ORIG_HEAD — минимальный путь"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "ORIG_HEAD автоматически выставляется reset/merge/rebase."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Внутри maxCommands=1 единственно реальный путь — ORIG_HEAD или HEAD@{1}.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "automatic-refs",
+          "orig-head-when-set",
+          "head-history-syntax"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "L1",
+      "title": "Stash перед пожаром",
+      "difficulty": "easy",
+      "points": 1,
+      "maxCommands": 7,
+      "inGame": {
+        "story": "Ты переписываешь Button.module.css, ничего не закоммичено.\nПрилетает срочный hotfix в main — у клиента в проде белый текст на белом фоне.\n",
+        "goal": "Уйти на main, починить (один коммит), вернуться, продолжить работу.",
+        "initialStateDisplay": {
+          "branchLabel": "feature/button",
+          "commits": [
+            {
+              "hash": "c1",
+              "message": "init button styles"
+            }
+          ],
+          "workingTree": "dirty: Button.module.css"
+        },
+        "bank": {
+          "commands": [
+            "stash",
+            "switch",
+            "commit",
+            "add",
+            "pop"
+          ],
+          "flags": [
+            "-m",
+            "-am"
+          ],
+          "args": [
+            "main",
+            "-",
+            "feature/button",
+            "\"fix: white-on-white\""
+          ],
+          "decoys": [
+            "git stash drop",
+            "git checkout -- .",
+            "git reset --hard",
+            "git clean -fd"
+          ],
+          "prebuilt": [
+            "git stash",
+            "git stash pop",
+            "git switch main",
+            "git switch -",
+            "git switch feature/button",
+            "git commit -am \"fix: white-on-white\"",
+            "git add .",
+            "git commit -m \"wip\"",
+            "git reset HEAD~1"
+          ]
+        },
+        "bankChips": [
+          "git stash",
+          "git switch",
+          "git commit",
+          "git add",
+          "git pop",
+          "-m",
+          "-am",
+          "main",
+          "-",
+          "feature/button",
+          "\"fix: white-on-white\"",
+          "git stash",
+          "git stash pop",
+          "git switch main",
+          "git switch -",
+          "git switch feature/button",
+          "git commit -am \"fix: white-on-white\"",
+          "git add .",
+          "git commit -m \"wip\"",
+          "git reset HEAD~1",
+          "git stash drop",
+          "git checkout -- .",
+          "git reset --hard",
+          "git clean -fd"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "stash + switch - + pop",
+            "sequence": [
+              {
+                "step": "git stash",
+                "acceptableVariants": [
+                  "git stash"
+                ]
+              },
+              {
+                "step": "git switch main",
+                "acceptableVariants": [
+                  "git switch main"
+                ]
+              },
+              {
+                "step": "git commit -am \"fix: white-on-white\"",
+                "acceptableVariants": [
+                  "git commit -am \"fix: white-on-white\""
+                ]
+              },
+              {
+                "step": "git switch -",
+                "acceptableVariants": [
+                  "git switch -",
+                  "git switch feature/button"
+                ]
+              },
+              {
+                "step": "git stash pop",
+                "acceptableVariants": [
+                  "git stash pop"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "stash + явный switch + pop",
+            "sequence": [
+              {
+                "step": "git stash",
+                "acceptableVariants": [
+                  "git stash"
+                ]
+              },
+              {
+                "step": "git switch main",
+                "acceptableVariants": [
+                  "git switch main"
+                ]
+              },
+              {
+                "step": "git commit -am \"fix: white-on-white\"",
+                "acceptableVariants": [
+                  "git commit -am \"fix: white-on-white\""
+                ]
+              },
+              {
+                "step": "git switch feature/button",
+                "acceptableVariants": [
+                  "git switch feature/button"
+                ]
+              },
+              {
+                "step": "git stash pop",
+                "acceptableVariants": [
+                  "git stash pop"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "long",
+            "label": "wip-коммит вместо stash",
+            "sequence": [
+              {
+                "step": "git add .",
+                "acceptableVariants": [
+                  "git add ."
+                ]
+              },
+              {
+                "step": "git commit -m \"wip\"",
+                "acceptableVariants": [
+                  "git commit -m \"wip\""
+                ]
+              },
+              {
+                "step": "git switch main",
+                "acceptableVariants": [
+                  "git switch main"
+                ]
+              },
+              {
+                "step": "git commit -am \"fix: white-on-white\"",
+                "acceptableVariants": [
+                  "git commit -am \"fix: white-on-white\""
+                ]
+              },
+              {
+                "step": "git switch feature/button",
+                "acceptableVariants": [
+                  "git switch feature/button"
+                ]
+              },
+              {
+                "step": "git reset HEAD~1",
+                "acceptableVariants": [
+                  "git reset HEAD~1"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git reset --hard",
+          "git clean -fd"
+        ],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "Незакоммиченные изменения можно временно отложить, не делая коммит.",
+          "После работы в другой ветке отложенное можно вернуть."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Stash — side-стек для временной заморозки worktree+index.\nИспользуется, когда нужно срочно переключиться, а wip-коммит делать не хочется.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "stash + switch - + pop",
+            "commentary": "Короткая форма: switch - возвращает на предыдущую ветку без указания имени.\n"
+          },
+          {
+            "solutionLabel": "stash + явный switch + pop",
+            "commentary": "То же самое, но с явным именем ветки — типичное middle-решение.\n"
+          },
+          {
+            "solutionLabel": "wip-коммит вместо stash",
+            "commentary": "Длиннее и грязнее: создаёт мусорный коммит, потом его откатывает.\n"
+          }
+        ],
+        "extraPatterns": [],
+        "aliases": [
+          {
+            "from": "git switch -",
+            "to": "git checkout -",
+            "note": "Старая форма, эквивалентна"
+          }
+        ],
+        "relatedKnowledge": [
+          "stash-advanced",
+          "switch-vs-checkout"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-stash(1)",
+            "url": "https://git-scm.com/docs/git-stash"
+          },
+          {
+            "title": "git-switch(1)",
+            "url": "https://git-scm.com/docs/git-switch"
+          }
+        ]
+      }
+    },
+    {
+      "id": "L2",
+      "title": "Не туда закоммитил",
+      "difficulty": "easy",
+      "points": 1,
+      "maxCommands": 5,
+      "inGame": {
+        "story": "По привычке закоммитил правку tokens.css прямо в main локально. Ещё не пушил.\nМарк увидит — убьёт.\n",
+        "goal": "Перенести коммит в новую ветку feature/tokens, main оставить чистой.",
+        "initialStateDisplay": {
+          "branchLabel": "main",
+          "commits": [
+            {
+              "hash": "c1",
+              "message": "tokens.css tweak"
+            }
+          ],
+          "workingTree": "clean"
+        },
+        "bank": {
+          "commands": [
+            "branch",
+            "reset",
+            "switch",
+            "checkout"
+          ],
+          "flags": [
+            "--hard",
+            "--soft",
+            "--mixed",
+            "-b"
+          ],
+          "args": [
+            "HEAD~1",
+            "feature/tokens",
+            "main"
+          ],
+          "decoys": [
+            "git revert HEAD",
+            "git cherry-pick",
+            "git push --force"
+          ],
+          "prebuilt": [
+            "git branch feature/tokens",
+            "git reset --hard HEAD~1",
+            "git reset --soft HEAD~1",
+            "git switch feature/tokens",
+            "git switch main",
+            "git checkout -b feature/tokens"
+          ]
+        },
+        "bankChips": [
+          "git branch",
+          "git reset",
+          "git switch",
+          "git checkout",
+          "--hard",
+          "--soft",
+          "--mixed",
+          "-b",
+          "HEAD~1",
+          "feature/tokens",
+          "main",
+          "git branch feature/tokens",
+          "git reset --hard HEAD~1",
+          "git reset --soft HEAD~1",
+          "git switch feature/tokens",
+          "git switch main",
+          "git checkout -b feature/tokens",
+          "git revert HEAD",
+          "git cherry-pick",
+          "git push --force"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "branch + reset --hard + switch",
+            "sequence": [
+              {
+                "step": "git branch feature/tokens",
+                "acceptableVariants": [
+                  "git branch feature/tokens"
+                ]
+              },
+              {
+                "step": "git reset --hard HEAD~1",
+                "acceptableVariants": [
+                  "git reset --hard HEAD~1"
+                ]
+              },
+              {
+                "step": "git switch feature/tokens",
+                "acceptableVariants": [
+                  "git switch feature/tokens"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "long",
+            "label": "checkout -b + back to main + reset",
+            "sequence": [
+              {
+                "step": "git checkout -b feature/tokens",
+                "acceptableVariants": [
+                  "git checkout -b feature/tokens"
+                ]
+              },
+              {
+                "step": "git switch main",
+                "acceptableVariants": [
+                  "git switch main"
+                ]
+              },
+              {
+                "step": "git reset --hard HEAD~1",
+                "acceptableVariants": [
+                  "git reset --hard HEAD~1"
+                ]
+              },
+              {
+                "step": "git switch feature/tokens",
+                "acceptableVariants": [
+                  "git switch feature/tokens"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git push --force"
+        ],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "Сначала зафиксируй текущий коммит в новой ветке (можно без переключения).",
+          "Потом откати main на 1 коммит назад. С флагом аккуратнее — soft оставит правки в индексе."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Ветка — указатель на коммит. Создаём ветку из текущего HEAD, откатываем main.\nreset --hard здесь уместен — коммит уже сохранён в новой ветке.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "branch + reset --hard + switch",
+            "commentary": "Минимальный путь: branch фиксирует HEAD в новой ветке, reset --hard\nбезопасно сдвигает main назад.\n"
+          },
+          {
+            "solutionLabel": "checkout -b + back to main + reset",
+            "commentary": "Дольше, но классика. checkout -b сразу переключает, потом возвращаемся.\n"
+          }
+        ],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "reset-soft-mixed-hard",
+          "branch-pointer-semantics"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-branch(1)",
+            "url": "https://git-scm.com/docs/git-branch"
+          },
+          {
+            "title": "git-reset(1)",
+            "url": "https://git-scm.com/docs/git-reset"
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3",
+      "title": "Опечатка в сообщении коммита",
+      "difficulty": "easy",
+      "points": 1,
+      "maxCommands": 3,
+      "inGame": {
+        "story": "Закоммитил \"fix buton hover state\". Не пушил. Марк всё ещё смотрит.\n",
+        "goal": "Исправить сообщение последнего коммита.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "commit",
+            "rebase",
+            "reset"
+          ],
+          "flags": [
+            "--amend",
+            "--soft",
+            "-i",
+            "-m"
+          ],
+          "args": [
+            "\"fix button hover state\"",
+            "HEAD~1"
+          ],
+          "decoys": [
+            "git rebase -i HEAD~1"
+          ],
+          "prebuilt": [
+            "git commit --amend -m \"fix button hover state\"",
+            "git reset --soft HEAD~1",
+            "git commit -m \"fix button hover state\""
+          ]
+        },
+        "bankChips": [
+          "git commit",
+          "git rebase",
+          "git reset",
+          "--amend",
+          "--soft",
+          "-i",
+          "-m",
+          "\"fix button hover state\"",
+          "HEAD~1",
+          "git commit --amend -m \"fix button hover state\"",
+          "git reset --soft HEAD~1",
+          "git commit -m \"fix button hover state\"",
+          "git rebase -i HEAD~1"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "amend одной командой",
+            "sequence": [
+              {
+                "step": "git commit --amend -m \"fix button hover state\"",
+                "acceptableVariants": [
+                  "git commit --amend -m \"fix button hover state\""
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "long",
+            "label": "reset --soft + новый коммит",
+            "sequence": [
+              {
+                "step": "git reset --soft HEAD~1",
+                "acceptableVariants": [
+                  "git reset --soft HEAD~1"
+                ]
+              },
+              {
+                "step": "git commit -m \"fix button hover state\"",
+                "acceptableVariants": [
+                  "git commit -m \"fix button hover state\""
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "Есть команда специально для исправления последнего коммита."
+        ]
+      },
+      "knowledge": {
+        "explanation": "git commit --amend заменяет HEAD-коммит. После push требует --force-with-lease.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "amend одной командой",
+            "commentary": "Самый короткий путь."
+          }
+        ],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "amend-after-push",
+          "commit-fixup-autosquash"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-commit(1)",
+            "url": "https://git-scm.com/docs/git-commit"
+          }
+        ]
+      }
+    },
+    {
+      "id": "L4",
+      "title": "Забыл файл в коммите",
+      "difficulty": "easy",
+      "points": 1,
+      "maxCommands": 3,
+      "inGame": {
+        "story": "Закоммитил рефакторинг \"extract mixins\", забыл src/styles/_mixins.scss. Не пушил.\n",
+        "goal": "Добавить файл в тот же коммит, не создавая новый.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "add",
+            "commit"
+          ],
+          "flags": [
+            "--amend",
+            "--no-edit",
+            "-m"
+          ],
+          "args": [
+            "src/styles/_mixins.scss"
+          ],
+          "decoys": [
+            "git commit -m \"add mixins\"",
+            "git stash",
+            "git reset"
+          ],
+          "prebuilt": [
+            "git add src/styles/_mixins.scss",
+            "git commit --amend --no-edit",
+            "git commit --amend"
+          ]
+        },
+        "bankChips": [
+          "git add",
+          "git commit",
+          "--amend",
+          "--no-edit",
+          "-m",
+          "src/styles/_mixins.scss",
+          "git add src/styles/_mixins.scss",
+          "git commit --amend --no-edit",
+          "git commit --amend",
+          "git commit -m \"add mixins\"",
+          "git stash",
+          "git reset"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "add + amend --no-edit",
+            "sequence": [
+              {
+                "step": "git add src/styles/_mixins.scss",
+                "acceptableVariants": [
+                  "git add src/styles/_mixins.scss"
+                ]
+              },
+              {
+                "step": "git commit --amend --no-edit",
+                "acceptableVariants": [
+                  "git commit --amend --no-edit"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "add + amend",
+            "sequence": [
+              {
+                "step": "git add src/styles/_mixins.scss",
+                "acceptableVariants": [
+                  "git add src/styles/_mixins.scss"
+                ]
+              },
+              {
+                "step": "git commit --amend",
+                "acceptableVariants": [
+                  "git commit --amend"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "amend позволяет дополнить последний коммит."
+        ]
+      },
+      "knowledge": {
+        "explanation": "--amend --no-edit добавляет staged-изменения к HEAD без редактирования сообщения.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "amend-pitfalls"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "L5",
+      "title": "Откатить файл к версии в main",
+      "difficulty": "easy",
+      "points": 1,
+      "maxCommands": 2,
+      "inGame": {
+        "story": "В feature/dark-mode наэкспериментировал в variables.css, всё поехало.\nВернуть только этот файл к версии из main. Остальные изменения в ветке сохранить.\n",
+        "goal": "Восстановить один файл из другой ветки, не трогая остальные правки.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "checkout",
+            "restore",
+            "reset",
+            "show"
+          ],
+          "flags": [
+            "--source=main",
+            "--"
+          ],
+          "args": [
+            "main",
+            "src/styles/variables.css"
+          ],
+          "decoys": [
+            "git checkout main",
+            "git reset --hard main",
+            "git revert",
+            "git stash"
+          ],
+          "prebuilt": [
+            "git restore --source=main src/styles/variables.css",
+            "git checkout main -- src/styles/variables.css"
+          ]
+        },
+        "bankChips": [
+          "git checkout",
+          "git restore",
+          "git reset",
+          "git show",
+          "--source=main",
+          "--",
+          "main",
+          "src/styles/variables.css",
+          "git restore --source=main src/styles/variables.css",
+          "git checkout main -- src/styles/variables.css",
+          "git checkout main",
+          "git reset --hard main",
+          "git revert",
+          "git stash"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "restore --source",
+            "sequence": [
+              {
+                "step": "git restore --source=main src/styles/variables.css",
+                "acceptableVariants": [
+                  "git restore --source=main src/styles/variables.css"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "checkout -- path",
+            "sequence": [
+              {
+                "step": "git checkout main -- src/styles/variables.css",
+                "acceptableVariants": [
+                  "git checkout main -- src/styles/variables.css"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git checkout main",
+          "git reset --hard main"
+        ],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesCommand",
+                "command": "git restore"
+              },
+              "points": 1,
+              "reason": "современный restore вместо checkout"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "restore умеет тянуть из другой ветки одной командой."
+        ]
+      },
+      "knowledge": {
+        "explanation": "git restore --source=<ref> <path> — современный способ заменить файл версией из ref.\nБез `--`/`-- path` checkout main переключит всю рабочую ветку.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [
+          {
+            "from": "git checkout main -- file",
+            "to": "git restore --source=main file",
+            "note": "Современная альтернатива"
+          }
+        ],
+        "relatedKnowledge": [
+          "restore-vs-checkout",
+          "git-show-paths"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-restore(1)",
+            "url": "https://git-scm.com/docs/git-restore"
+          }
+        ]
+      }
+    },
+    {
+      "id": "M1",
+      "title": "Cherry-pick хотфикса",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 4,
+      "inGame": {
+        "story": "В main запушен срочный фикс :focus-visible (hash a1b2c3d).\nВ feature/forms он нужен сейчас. Мержить main целиком нельзя.\n",
+        "goal": "Перенести один коммит из main в текущую ветку, разрешить конфликт.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "cherry-pick",
+            "add",
+            "merge",
+            "rebase",
+            "commit"
+          ],
+          "flags": [
+            "--continue",
+            "--abort",
+            "-n",
+            "-x",
+            "-m"
+          ],
+          "args": [
+            "a1b2c3d",
+            "main",
+            "src/components/forms.css",
+            "\"chore: focus-visible\""
+          ],
+          "decoys": [
+            "git merge main",
+            "git rebase main",
+            "git cherry-pick --abort"
+          ],
+          "prebuilt": [
+            "git cherry-pick a1b2c3d",
+            "git cherry-pick -x a1b2c3d",
+            "git cherry-pick -n a1b2c3d",
+            "git add src/components/forms.css",
+            "git cherry-pick --continue",
+            "git commit -m \"chore: focus-visible\""
+          ]
+        },
+        "bankChips": [
+          "git cherry-pick",
+          "git add",
+          "git merge",
+          "git rebase",
+          "git commit",
+          "--continue",
+          "--abort",
+          "-n",
+          "-x",
+          "-m",
+          "a1b2c3d",
+          "main",
+          "src/components/forms.css",
+          "\"chore: focus-visible\"",
+          "git cherry-pick a1b2c3d",
+          "git cherry-pick -x a1b2c3d",
+          "git cherry-pick -n a1b2c3d",
+          "git add src/components/forms.css",
+          "git cherry-pick --continue",
+          "git commit -m \"chore: focus-visible\"",
+          "git merge main",
+          "git rebase main",
+          "git cherry-pick --abort"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "cherry-pick -x + resolve + continue",
+            "sequence": [
+              {
+                "step": "git cherry-pick -x a1b2c3d",
+                "acceptableVariants": [
+                  "git cherry-pick -x a1b2c3d"
+                ]
+              },
+              {
+                "step": "git add src/components/forms.css",
+                "acceptableVariants": [
+                  "git add src/components/forms.css"
+                ]
+              },
+              {
+                "step": "git cherry-pick --continue",
+                "acceptableVariants": [
+                  "git cherry-pick --continue"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "cherry-pick + continue",
+            "sequence": [
+              {
+                "step": "git cherry-pick a1b2c3d",
+                "acceptableVariants": [
+                  "git cherry-pick a1b2c3d"
+                ]
+              },
+              {
+                "step": "git add src/components/forms.css",
+                "acceptableVariants": [
+                  "git add src/components/forms.css"
+                ]
+              },
+              {
+                "step": "git cherry-pick --continue",
+                "acceptableVariants": [
+                  "git cherry-pick --continue"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "long",
+            "label": "cherry-pick -n + ручной commit",
+            "sequence": [
+              {
+                "step": "git cherry-pick -n a1b2c3d",
+                "acceptableVariants": [
+                  "git cherry-pick -n a1b2c3d"
+                ]
+              },
+              {
+                "step": "git add src/components/forms.css",
+                "acceptableVariants": [
+                  "git add src/components/forms.css"
+                ]
+              },
+              {
+                "step": "git commit -m \"chore: focus-visible\"",
+                "acceptableVariants": [
+                  "git commit -m \"chore: focus-visible\""
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git merge main",
+          "git rebase main"
+        ],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "-x"
+              },
+              "points": 1,
+              "reason": "-x записывает исходный hash в сообщение"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "cherry-pick переносит коммит по хэшу. Конфликты решаются как в обычном merge: add + --continue."
+        ]
+      },
+      "knowledge": {
+        "explanation": "cherry-pick переносит конкретный коммит в текущую ветку. Флаг -x добавляет в сообщение\nссылку на оригинальный коммит — полезно для аудита.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "cherry-pick-ranges",
+          "cherry-pick-merge-commits"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-cherry-pick(1)",
+            "url": "https://git-scm.com/docs/git-cherry-pick"
+          }
+        ]
+      }
+    },
+    {
+      "id": "M2",
+      "title": "Переименовать ветку и обновить remote",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 5,
+      "inGame": {
+        "story": "Создал ветку fix-stuff, понял что должно быть fix/header-z-index.\nУже запушил, есть PR, но никто другой её не пуллил.\n",
+        "goal": "Переименовать локально и на remote, удалить старую.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "branch",
+            "push"
+          ],
+          "flags": [
+            "-m",
+            "--delete",
+            "-u"
+          ],
+          "args": [
+            "fix-stuff",
+            "fix/header-z-index",
+            "origin"
+          ],
+          "decoys": [
+            "git remote rename",
+            "git branch -D fix-stuff",
+            "git push --force"
+          ],
+          "prebuilt": [
+            "git branch -m fix-stuff fix/header-z-index",
+            "git push origin -u fix/header-z-index",
+            "git push origin --delete fix-stuff"
+          ]
+        },
+        "bankChips": [
+          "git branch",
+          "git push",
+          "-m",
+          "--delete",
+          "-u",
+          "fix-stuff",
+          "fix/header-z-index",
+          "origin",
+          "git branch -m fix-stuff fix/header-z-index",
+          "git push origin -u fix/header-z-index",
+          "git push origin --delete fix-stuff",
+          "git remote rename",
+          "git branch -D fix-stuff",
+          "git push --force"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "branch -m + push -u + push --delete",
+            "sequence": [
+              {
+                "step": "git branch -m fix-stuff fix/header-z-index",
+                "acceptableVariants": [
+                  "git branch -m fix-stuff fix/header-z-index"
+                ]
+              },
+              {
+                "step": "git push origin -u fix/header-z-index",
+                "acceptableVariants": [
+                  "git push origin -u fix/header-z-index"
+                ]
+              },
+              {
+                "step": "git push origin --delete fix-stuff",
+                "acceptableVariants": [
+                  "git push origin --delete fix-stuff"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git branch -D fix-stuff"
+        ],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "branch -m переименовывает локально. Remote-tracking надо настроить заново через push -u."
+        ]
+      },
+      "knowledge": {
+        "explanation": "На remote нельзя «переименовать» ветку — только запушить новую и удалить старую.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "push-autosetup",
+          "branch-move-mechanics"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M3",
+      "title": "Squash трёх коммитов",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 6,
+      "inGame": {
+        "story": "Три коммита: \"wip\", \"wip 2\", \"finally works\".\nМарк требует один осмысленный коммит перед PR.\n",
+        "goal": "Схлопнуть три коммита в один с нормальным сообщением.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "rebase",
+            "reset",
+            "commit"
+          ],
+          "flags": [
+            "-i",
+            "--soft",
+            "-m"
+          ],
+          "args": [
+            "HEAD~3",
+            "\"feat: implement button variants\""
+          ],
+          "decoys": [
+            "git merge --squash",
+            "git commit --amend",
+            "git reset --hard HEAD~3"
+          ],
+          "prebuilt": [
+            "git reset --soft HEAD~3",
+            "git commit -m \"feat: implement button variants\"",
+            "git rebase -i HEAD~3"
+          ]
+        },
+        "bankChips": [
+          "git rebase",
+          "git reset",
+          "git commit",
+          "-i",
+          "--soft",
+          "-m",
+          "HEAD~3",
+          "\"feat: implement button variants\"",
+          "git reset --soft HEAD~3",
+          "git commit -m \"feat: implement button variants\"",
+          "git rebase -i HEAD~3",
+          "git merge --squash",
+          "git commit --amend",
+          "git reset --hard HEAD~3"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "reset --soft + commit",
+            "sequence": [
+              {
+                "step": "git reset --soft HEAD~3",
+                "acceptableVariants": [
+                  "git reset --soft HEAD~3"
+                ]
+              },
+              {
+                "step": "git commit -m \"feat: implement button variants\"",
+                "acceptableVariants": [
+                  "git commit -m \"feat: implement button variants\""
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "interactive rebase",
+            "sequence": [
+              {
+                "step": "git rebase -i HEAD~3",
+                "acceptableVariants": [
+                  "git rebase -i HEAD~3",
+                  "git rebase --interactive HEAD~3"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "reset --soft переводит коммиты в индекс одной командой.",
+          "interactive rebase даёт больше контроля, но длиннее."
+        ]
+      },
+      "knowledge": {
+        "explanation": "reset --soft HEAD~3 убирает три верхних коммита, но оставляет их изменения staged.\nДальше — обычный commit. Альтернатива — rebase -i с пометкой squash/fixup.\n",
+        "solutionsCommentary": [
+          {
+            "solutionLabel": "reset --soft + commit",
+            "commentary": "Самый короткий путь полного squash."
+          }
+        ],
+        "extraPatterns": [],
+        "aliases": [
+          {
+            "from": "git rebase -i HEAD~3 (для полного squash)",
+            "to": "git reset --soft HEAD~3 && git commit",
+            "note": "Короче, если задача — схлопнуть всё в один."
+          }
+        ],
+        "relatedKnowledge": [
+          "rebase-interactive-actions",
+          "commit-fixup-flow"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-rebase(1)",
+            "url": "https://git-scm.com/docs/git-rebase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "M4",
+      "title": "Revert запушенного коммита",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 3,
+      "inGame": {
+        "story": "Соня запушила в main коммит (hash bad1234), ломающий сборку Storybook.\nИстория запулена всеми.\n",
+        "goal": "Отменить эффект коммита, не переписывая историю.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "revert",
+            "reset",
+            "push"
+          ],
+          "flags": [
+            "--hard",
+            "--force",
+            "--force-with-lease",
+            "--no-edit"
+          ],
+          "args": [
+            "bad1234",
+            "HEAD~1",
+            "origin",
+            "main"
+          ],
+          "decoys": [
+            "git reset --hard HEAD~1",
+            "git push --force"
+          ],
+          "prebuilt": [
+            "git revert bad1234",
+            "git revert --no-edit bad1234",
+            "git push"
+          ]
+        },
+        "bankChips": [
+          "git revert",
+          "git reset",
+          "git push",
+          "--hard",
+          "--force",
+          "--force-with-lease",
+          "--no-edit",
+          "bad1234",
+          "HEAD~1",
+          "origin",
+          "main",
+          "git revert bad1234",
+          "git revert --no-edit bad1234",
+          "git push",
+          "git reset --hard HEAD~1",
+          "git push --force"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "revert + push",
+            "sequence": [
+              {
+                "step": "git revert bad1234",
+                "acceptableVariants": [
+                  "git revert bad1234"
+                ]
+              },
+              {
+                "step": "git push",
+                "acceptableVariants": [
+                  "git push"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "revert --no-edit + push",
+            "sequence": [
+              {
+                "step": "git revert --no-edit bad1234",
+                "acceptableVariants": [
+                  "git revert --no-edit bad1234"
+                ]
+              },
+              {
+                "step": "git push",
+                "acceptableVariants": [
+                  "git push"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git reset --hard HEAD~1",
+          "git push --force"
+        ],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "revert создаёт новый коммит-инверсию. Push без force — история не переписывается."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Shared-история ≠ право на rewrite. revert безопасен для пушенных коммитов.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "revert-vs-reset",
+          "revert-merge-commits"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-revert(1)",
+            "url": "https://git-scm.com/docs/git-revert"
+          }
+        ]
+      }
+    },
+    {
+      "id": "M5",
+      "title": "Reflog спасает после reset --hard",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 4,
+      "inGame": {
+        "story": "Соня сделала git reset --hard HEAD~5, потеряла 5 коммитов работы над модалкой.\nНе пушила. Плачет.\n",
+        "goal": "Восстановить ветку на потерянный коммит.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "reflog",
+            "reset",
+            "branch"
+          ],
+          "flags": [
+            "--hard"
+          ],
+          "args": [
+            "ORIG_HEAD",
+            "HEAD@{1}",
+            "deadbee",
+            "recovery"
+          ],
+          "decoys": [
+            "git pull",
+            "git revert",
+            "git fsck --lost-found"
+          ],
+          "prebuilt": [
+            "git reset --hard ORIG_HEAD",
+            "git reset --hard HEAD@{1}",
+            "git reflog",
+            "git reset --hard deadbee",
+            "git branch recovery deadbee"
+          ]
+        },
+        "bankChips": [
+          "git reflog",
+          "git reset",
+          "git branch",
+          "--hard",
+          "ORIG_HEAD",
+          "HEAD@{1}",
+          "deadbee",
+          "recovery",
+          "git reset --hard ORIG_HEAD",
+          "git reset --hard HEAD@{1}",
+          "git reflog",
+          "git reset --hard deadbee",
+          "git branch recovery deadbee",
+          "git pull",
+          "git revert",
+          "git fsck --lost-found"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "reset --hard ORIG_HEAD",
+            "sequence": [
+              {
+                "step": "git reset --hard ORIG_HEAD",
+                "acceptableVariants": [
+                  "git reset --hard ORIG_HEAD"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "reflog + reset",
+            "sequence": [
+              {
+                "step": "git reflog",
+                "acceptableVariants": [
+                  "git reflog"
+                ]
+              },
+              {
+                "step": "git reset --hard deadbee",
+                "acceptableVariants": [
+                  "git reset --hard deadbee"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "long",
+            "label": "safer recovery branch",
+            "sequence": [
+              {
+                "step": "git reflog",
+                "acceptableVariants": [
+                  "git reflog"
+                ]
+              },
+              {
+                "step": "git branch recovery deadbee",
+                "acceptableVariants": [
+                  "git branch recovery deadbee"
+                ]
+              },
+              {
+                "step": "git reset --hard deadbee",
+                "acceptableVariants": [
+                  "git reset --hard deadbee"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesArg",
+                "arg": "ORIG_HEAD"
+              },
+              "points": 1,
+              "reason": "ORIG_HEAD — короткий путь"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "ORIG_HEAD автоматически выставляется перед опасными операциями.",
+          "reflog показывает все позиции HEAD."
+        ]
+      },
+      "knowledge": {
+        "explanation": "reset --hard выставляет ORIG_HEAD на предыдущий HEAD. reflog хранит историю позиций.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "reflog-mechanics",
+          "orig-head-when-set",
+          "gc-and-pruning"
+        ],
+        "externalLinks": [
+          {
+            "title": "git-reflog(1)",
+            "url": "https://git-scm.com/docs/git-reflog"
+          }
+        ]
+      }
+    },
+    {
+      "id": "M6",
+      "title": "Поломанный merge, нужно прервать",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 3,
+      "inGame": {
+        "story": "Начал git merge main, 30 конфликтов в CSS, rebase был бы чище.\n",
+        "goal": "Прервать merge, сделать rebase.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "merge",
+            "rebase",
+            "reset"
+          ],
+          "flags": [
+            "--abort",
+            "--hard"
+          ],
+          "args": [
+            "main",
+            "HEAD"
+          ],
+          "decoys": [
+            "git revert MERGE_HEAD",
+            "git stash"
+          ],
+          "prebuilt": [
+            "git merge --abort",
+            "git reset --hard HEAD",
+            "git rebase main"
+          ]
+        },
+        "bankChips": [
+          "git merge",
+          "git rebase",
+          "git reset",
+          "--abort",
+          "--hard",
+          "main",
+          "HEAD",
+          "git merge --abort",
+          "git reset --hard HEAD",
+          "git rebase main",
+          "git revert MERGE_HEAD",
+          "git stash"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "merge --abort + rebase",
+            "sequence": [
+              {
+                "step": "git merge --abort",
+                "acceptableVariants": [
+                  "git merge --abort"
+                ]
+              },
+              {
+                "step": "git rebase main",
+                "acceptableVariants": [
+                  "git rebase main"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "reset + rebase",
+            "sequence": [
+              {
+                "step": "git reset --hard HEAD",
+                "acceptableVariants": [
+                  "git reset --hard HEAD"
+                ]
+              },
+              {
+                "step": "git rebase main",
+                "acceptableVariants": [
+                  "git rebase main"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesFlag",
+                "flag": "--abort"
+              },
+              "points": 1,
+              "reason": "merge --abort — корректный способ"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "merge --abort откатывает и очищает state-файлы."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Во время merge git хранит MERGE_HEAD и MERGE_MSG. merge --abort их подчищает.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "merge-state-files",
+          "abort-vs-reset"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M7",
+      "title": "Подтянуть main без merge-коммита",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 3,
+      "inGame": {
+        "story": "Неделю сидишь в feature/grid-system. main ушла на 40 коммитов.\nМарк ненавидит merge-коммиты в feature-ветках.\n",
+        "goal": "Подтянуть изменения, оставив линейную историю.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "fetch",
+            "rebase",
+            "pull",
+            "merge"
+          ],
+          "flags": [
+            "--rebase"
+          ],
+          "args": [
+            "origin",
+            "origin/main",
+            "main"
+          ],
+          "decoys": [
+            "git merge main",
+            "git reset --hard origin/main"
+          ],
+          "prebuilt": [
+            "git fetch origin",
+            "git rebase origin/main",
+            "git pull --rebase origin main"
+          ]
+        },
+        "bankChips": [
+          "git fetch",
+          "git rebase",
+          "git pull",
+          "git merge",
+          "--rebase",
+          "origin",
+          "origin/main",
+          "main",
+          "git fetch origin",
+          "git rebase origin/main",
+          "git pull --rebase origin main",
+          "git merge main",
+          "git reset --hard origin/main"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "fetch + rebase",
+            "sequence": [
+              {
+                "step": "git fetch origin",
+                "acceptableVariants": [
+                  "git fetch origin"
+                ]
+              },
+              {
+                "step": "git rebase origin/main",
+                "acceptableVariants": [
+                  "git rebase origin/main"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "pull --rebase",
+            "sequence": [
+              {
+                "step": "git pull --rebase origin main",
+                "acceptableVariants": [
+                  "git pull --rebase origin main"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [
+          "git reset --hard origin/main"
+        ],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "rebase даёт линейную историю."
+        ]
+      },
+      "knowledge": {
+        "explanation": "pull.rebase=true делает rebase поведением по умолчанию.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "pull-rebase-config",
+          "linear-history-philosophy"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M8",
+      "title": "Частичный коммит из одного файла",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 6,
+      "inGame": {
+        "story": "В layout.css два несвязанных изменения — grid в хедере и z-index у модалок.\n",
+        "goal": "Закоммитить раздельно: два коммита с правильным разделением.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "add",
+            "commit"
+          ],
+          "flags": [
+            "-p",
+            "-m"
+          ],
+          "args": [
+            "layout.css",
+            "\"fix: header grid\"",
+            "\"refactor: modal z-index\""
+          ],
+          "decoys": [
+            "git add layout.css",
+            "git stash -p",
+            "git commit --amend"
+          ],
+          "prebuilt": [
+            "git add -p layout.css",
+            "git commit -m \"fix: header grid\"",
+            "git commit -m \"refactor: modal z-index\""
+          ]
+        },
+        "bankChips": [
+          "git add",
+          "git commit",
+          "-p",
+          "-m",
+          "layout.css",
+          "\"fix: header grid\"",
+          "\"refactor: modal z-index\"",
+          "git add -p layout.css",
+          "git commit -m \"fix: header grid\"",
+          "git commit -m \"refactor: modal z-index\"",
+          "git add layout.css",
+          "git stash -p",
+          "git commit --amend"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "add -p + commit ×2",
+            "sequence": [
+              {
+                "step": "git add -p layout.css",
+                "acceptableVariants": [
+                  "git add -p layout.css"
+                ]
+              },
+              {
+                "step": "git commit -m \"fix: header grid\"",
+                "acceptableVariants": [
+                  "git commit -m \"fix: header grid\""
+                ]
+              },
+              {
+                "step": "git add -p layout.css",
+                "acceptableVariants": [
+                  "git add -p layout.css"
+                ]
+              },
+              {
+                "step": "git commit -m \"refactor: modal z-index\"",
+                "acceptableVariants": [
+                  "git commit -m \"refactor: modal z-index\""
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "add -p даёт интерактивный выбор hunk'ов."
+        ]
+      },
+      "knowledge": {
+        "explanation": "add -p позволяет stage'ить отдельные hunks из файла.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "add-patch-mechanics",
+          "stash-patch"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M9",
+      "title": "Быстрое переключение туда-обратно",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 8,
+      "inGame": {
+        "story": "Ревьюишь чужой PR — нужно 5 раз посмотреть-сравнить состояние своей ветки и review/feature-x.\n",
+        "goal": "5 переключений между двумя ветками.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "switch"
+          ],
+          "args": [
+            "-",
+            "review/feature-x",
+            "my-branch"
+          ],
+          "decoys": [
+            "git stash",
+            "git checkout"
+          ],
+          "prebuilt": [
+            "git switch review/feature-x",
+            "git switch -",
+            "git switch my-branch"
+          ]
+        },
+        "bankChips": [
+          "git switch",
+          "-",
+          "review/feature-x",
+          "my-branch",
+          "git switch review/feature-x",
+          "git switch -",
+          "git switch my-branch",
+          "git stash",
+          "git checkout"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "5 × switch -",
+            "sequence": [
+              {
+                "step": "git switch review/feature-x",
+                "acceptableVariants": [
+                  "git switch review/feature-x"
+                ]
+              },
+              {
+                "step": "git switch -",
+                "acceptableVariants": [
+                  "git switch -"
+                ]
+              },
+              {
+                "step": "git switch -",
+                "acceptableVariants": [
+                  "git switch -"
+                ]
+              },
+              {
+                "step": "git switch -",
+                "acceptableVariants": [
+                  "git switch -"
+                ]
+              },
+              {
+                "step": "git switch -",
+                "acceptableVariants": [
+                  "git switch -"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesArg",
+                "arg": "-"
+              },
+              "points": 1,
+              "reason": "switch - короче полного имени"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "switch - возвращает на предыдущую ветку."
+        ]
+      },
+      "knowledge": {
+        "explanation": "switch - и @{-1} — алиасы предыдущей ветки.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "switch-dash-aliases",
+          "revision-syntax-deep"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M10",
+      "title": "ORIG_HEAD после неудачного rebase",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 2,
+      "inGame": {
+        "story": "Сделал git rebase main на feature/forms, история сломалась.\nРешил половину конфликтов, потом понял что подход неверный.\n--abort уже не вариант (коммит посередине).\n",
+        "goal": "Вернуть ветку в pre-rebase позицию.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "reset",
+            "reflog"
+          ],
+          "flags": [
+            "--hard"
+          ],
+          "args": [
+            "ORIG_HEAD",
+            "HEAD@{1}",
+            "abc123"
+          ],
+          "decoys": [
+            "git rebase --abort"
+          ],
+          "prebuilt": [
+            "git reset --hard ORIG_HEAD",
+            "git reset --hard HEAD@{1}",
+            "git reflog",
+            "git reset --hard abc123"
+          ]
+        },
+        "bankChips": [
+          "git reset",
+          "git reflog",
+          "--hard",
+          "ORIG_HEAD",
+          "HEAD@{1}",
+          "abc123",
+          "git reset --hard ORIG_HEAD",
+          "git reset --hard HEAD@{1}",
+          "git reflog",
+          "git reset --hard abc123",
+          "git rebase --abort"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "reset ORIG_HEAD",
+            "sequence": [
+              {
+                "step": "git reset --hard ORIG_HEAD",
+                "acceptableVariants": [
+                  "git reset --hard ORIG_HEAD"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "reflog + reset",
+            "sequence": [
+              {
+                "step": "git reflog",
+                "acceptableVariants": [
+                  "git reflog"
+                ]
+              },
+              {
+                "step": "git reset --hard abc123",
+                "acceptableVariants": [
+                  "git reset --hard abc123"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [
+            {
+              "condition": {
+                "type": "usesArg",
+                "arg": "ORIG_HEAD"
+              },
+              "points": 2,
+              "reason": "ORIG_HEAD — знание короткого пути"
+            }
+          ],
+          "penalties": []
+        },
+        "hints": [
+          "rebase выставляет ORIG_HEAD на pre-rebase позицию."
+        ]
+      },
+      "knowledge": {
+        "explanation": "ORIG_HEAD выставляется reset, merge, rebase, pull перед опасной операцией.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "orig-head-when-set",
+          "rebase-recovery"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M11",
+      "title": "Pickaxe: найти коммиты, трогавшие !important",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 2,
+      "inGame": {
+        "story": "Витя добавлял/удалял !important в .btn-primary за последний месяц.\nНайти все коммиты, где количество вхождений менялось.\n",
+        "goal": "Запустить правильную команду.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "log",
+            "blame",
+            "grep"
+          ],
+          "flags": [
+            "-S",
+            "-G",
+            "--grep",
+            "--"
+          ],
+          "args": [
+            "\"!important\"",
+            "styles/button.css"
+          ],
+          "decoys": [
+            "git log --grep",
+            "git blame"
+          ],
+          "prebuilt": [
+            "git log -S \"!important\" -- styles/button.css",
+            "git log -G \"!important\" -- styles/button.css"
+          ]
+        },
+        "bankChips": [
+          "git log",
+          "git blame",
+          "git grep",
+          "-S",
+          "-G",
+          "--grep",
+          "--",
+          "\"!important\"",
+          "styles/button.css",
+          "git log -S \"!important\" -- styles/button.css",
+          "git log -G \"!important\" -- styles/button.css",
+          "git log --grep",
+          "git blame"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "log -S",
+            "sequence": [
+              {
+                "step": "git log -S \"!important\" -- styles/button.css",
+                "acceptableVariants": [
+                  "git log -S \"!important\" -- styles/button.css"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "log -G",
+            "sequence": [
+              {
+                "step": "git log -G \"!important\" -- styles/button.css",
+                "acceptableVariants": [
+                  "git log -G \"!important\" -- styles/button.css"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "-S ищет изменения количества вхождений; -G — любые изменения совпадающих строк."
+        ]
+      },
+      "knowledge": {
+        "explanation": "Pickaxe (-S/-G) — search в diff'ах, а не в commit message (как --grep).\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "pickaxe-vs-grep",
+          "log-L-function-history"
+        ],
+        "externalLinks": []
+      }
+    },
+    {
+      "id": "M12",
+      "title": "Запушить ветку под другим именем",
+      "difficulty": "medium",
+      "points": 3,
+      "maxCommands": 2,
+      "inGame": {
+        "story": "Локально wip-experiment, на remote должна быть feature/experiment-x.\n",
+        "goal": "На remote feature/experiment-x. Локально wip-experiment.",
+        "initialStateDisplay": null,
+        "bank": {
+          "commands": [
+            "push"
+          ],
+          "flags": [
+            "-u"
+          ],
+          "args": [
+            "origin",
+            "wip-experiment:feature/experiment-x"
+          ],
+          "decoys": [
+            "git branch -m"
+          ],
+          "prebuilt": [
+            "git push origin wip-experiment:feature/experiment-x",
+            "git push -u origin wip-experiment:feature/experiment-x"
+          ]
+        },
+        "bankChips": [
+          "git push",
+          "-u",
+          "origin",
+          "wip-experiment:feature/experiment-x",
+          "git push origin wip-experiment:feature/experiment-x",
+          "git push -u origin wip-experiment:feature/experiment-x",
+          "git branch -m"
+        ],
+        "validSolutions": [
+          {
+            "kind": "ideal",
+            "label": "push refspec",
+            "sequence": [
+              {
+                "step": "git push origin wip-experiment:feature/experiment-x",
+                "acceptableVariants": [
+                  "git push origin wip-experiment:feature/experiment-x"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "standard",
+            "label": "push -u refspec",
+            "sequence": [
+              {
+                "step": "git push -u origin wip-experiment:feature/experiment-x",
+                "acceptableVariants": [
+                  "git push -u origin wip-experiment:feature/experiment-x"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbiddenCommands": [],
+        "pointsModifiers": {
+          "bonuses": [],
+          "penalties": []
+        },
+        "hints": [
+          "Refspec в push: <local>:<remote>."
+        ]
+      },
+      "knowledge": {
+        "explanation": "push <remote> <local>:<remote_branch> — отправляет под произвольным именем.\n",
+        "solutionsCommentary": [],
+        "extraPatterns": [],
+        "aliases": [],
+        "relatedKnowledge": [
+          "push-refspec",
+          "triangular-workflows"
+        ],
+        "externalLinks": []
+      }
+    }
+  ]
+}

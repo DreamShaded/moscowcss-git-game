@@ -1,0 +1,48 @@
+id: M9
+title: "Быстрое переключение туда-обратно"
+difficulty: medium
+points: 3
+maxCommands: 8
+
+inGame:
+  story: |
+    Ревьюишь чужой PR — нужно 5 раз посмотреть-сравнить состояние своей ветки и review/feature-x.
+  goal: "5 переключений между двумя ветками."
+  bank:
+    commands: [switch]
+    args: ["-", "review/feature-x", "my-branch"]
+    decoys:
+      - "git stash"
+      - "git checkout"
+    prebuilt:
+      - "git switch review/feature-x"
+      - "git switch -"
+      - "git switch my-branch"
+
+  validSolutions:
+    - kind: ideal
+      label: "5 × switch -"
+      sequence:
+        - step: "git switch review/feature-x"
+        - step: "git switch -"
+        - step: "git switch -"
+        - step: "git switch -"
+        - step: "git switch -"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesArg, arg: "-" }
+        points: 1
+        reason: "switch - короче полного имени"
+    penalties: []
+
+  hints:
+    - "switch - возвращает на предыдущую ветку."
+
+knowledge:
+  explanation: |
+    switch - и @{-1} — алиасы предыдущей ветки.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [switch-dash-aliases, revision-syntax-deep]
+  externalLinks: []

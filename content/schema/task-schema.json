@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Task",
+  "type": "object",
+  "required": ["id", "title", "difficulty", "points", "maxCommands", "inGame", "knowledge"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[LMH][0-9]+$" },
+    "title": { "type": "string" },
+    "difficulty": { "enum": ["easy", "medium", "hard"] },
+    "points": { "type": "integer", "minimum": 1 },
+    "maxCommands": { "type": "integer", "minimum": 1 },
+    "inGame": {
+      "type": "object",
+      "required": ["story", "goal", "bank", "validSolutions"],
+      "properties": {
+        "story": { "type": "string" },
+        "goal": { "type": "string" },
+        "initialStateDisplay": { "type": "object" },
+        "bank": {
+          "type": "object",
+          "properties": {
+            "commands": { "type": "array", "items": { "type": "string" } },
+            "flags":    { "type": "array", "items": { "type": "string" } },
+            "args":     { "type": "array", "items": { "type": "string" } },
+            "decoys":   { "type": "array", "items": { "type": "string" } },
+            "prebuilt": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "validSolutions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["kind", "sequence"],
+            "properties": {
+              "kind": { "enum": ["ideal", "standard", "long"] },
+              "label": { "type": "string" },
+              "sequence": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["step"],
+                  "properties": {
+                    "step": { "type": "string" },
+                    "acceptableVariants": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "forbiddenCommands": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "pointsModifiers": {
+          "type": "object",
+          "properties": {
+            "bonuses":   { "type": "array", "items": { "$ref": "#/definitions/modifier" } },
+            "penalties": { "type": "array", "items": { "$ref": "#/definitions/modifier" } }
+          }
+        },
+        "hints": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "knowledge": {
+      "type": "object",
+      "properties": {
+        "explanation": { "type": "string" },
+        "solutionsCommentary": { "type": "array" },
+        "extraPatterns": { "type": "array" },
+        "aliases": { "type": "array" },
+        "relatedKnowledge": { "type": "array", "items": { "type": "string" } },
+        "externalLinks": { "type": "array" }
+      }
+    }
+  },
+  "definitions": {
+    "modifier": {
+      "type": "object",
+      "required": ["condition", "points", "reason"],
+      "properties": {
+        "condition": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": { "enum": ["usesCommand", "usesFlag", "usesArg", "avoidsCommand", "lengthAtMost"] },
+            "command": { "type": "string" },
+            "flag": { "type": "string" },
+            "arg": { "type": "string" },
+            "length": { "type": "integer" }
+          }
+        },
+        "points": { "type": "integer" },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

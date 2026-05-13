@@ -1,0 +1,45 @@
+id: M2
+title: "Переименовать ветку и обновить remote"
+difficulty: medium
+points: 3
+maxCommands: 5
+
+inGame:
+  story: |
+    Создал ветку fix-stuff, понял что должно быть fix/header-z-index.
+    Уже запушил, есть PR, но никто другой её не пуллил.
+  goal: "Переименовать локально и на remote, удалить старую."
+  bank:
+    commands: [branch, push]
+    flags: ["-m", "--delete", "-u"]
+    args: ["fix-stuff", "fix/header-z-index", "origin"]
+    decoys:
+      - "git remote rename"
+      - "git branch -D fix-stuff"
+      - "git push --force"
+    prebuilt:
+      - "git branch -m fix-stuff fix/header-z-index"
+      - "git push origin -u fix/header-z-index"
+      - "git push origin --delete fix-stuff"
+
+  validSolutions:
+    - kind: ideal
+      label: "branch -m + push -u + push --delete"
+      sequence:
+        - step: "git branch -m fix-stuff fix/header-z-index"
+        - step: "git push origin -u fix/header-z-index"
+        - step: "git push origin --delete fix-stuff"
+
+  forbiddenCommands:
+    - "git branch -D fix-stuff"
+
+  hints:
+    - "branch -m переименовывает локально. Remote-tracking надо настроить заново через push -u."
+
+knowledge:
+  explanation: |
+    На remote нельзя «переименовать» ветку — только запушить новую и удалить старую.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [push-autosetup, branch-move-mechanics]
+  externalLinks: []

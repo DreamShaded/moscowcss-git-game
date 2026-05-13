@@ -1,0 +1,58 @@
+id: H7
+title: "Запушенная история требует переписывания"
+difficulty: hard
+points: 7
+maxCommands: 6
+
+inGame:
+  story: |
+    Ветка develop (shared, 4 человека). Затесался коммит с лицензионно-проблемным шрифтом (bad7).
+    Все четверо уже спулили.
+  goal: "Переписать историю develop, force-push с safety."
+  bank:
+    commands: [rebase, push]
+    flags: ["-i", "--force", "--force-with-lease", "--force-if-includes"]
+    args: ["bad7~1", "origin", "develop"]
+    decoys:
+      - "git push --force origin develop"
+      - "git revert bad7"
+    prebuilt:
+      - "git rebase -i bad7~1"
+      - "git push --force-with-lease origin develop"
+      - "git push --force-with-lease --force-if-includes origin develop"
+
+  validSolutions:
+    - kind: ideal
+      label: "rebase + force-with-lease + if-includes"
+      sequence:
+        - step: "git rebase -i bad7~1"
+        - step: "git push --force-with-lease --force-if-includes origin develop"
+    - kind: standard
+      label: "rebase + force-with-lease"
+      sequence:
+        - step: "git rebase -i bad7~1"
+        - step: "git push --force-with-lease origin develop"
+
+  forbiddenCommands:
+    - "git push --force origin develop"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesFlag, flag: "--force-with-lease" }
+        points: 2
+        reason: "safety force-push"
+      - condition: { type: usesFlag, flag: "--force-if-includes" }
+        points: 1
+        reason: "доп. защита от races"
+    penalties: []
+
+  hints:
+    - "--force-with-lease проверяет, что remote не ушёл вперёд."
+
+knowledge:
+  explanation: |
+    --force-with-lease отказывается перезаписать, если ваш local-ref устарел.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [force-with-lease-vs-force, post-rewrite-team-protocol]
+  externalLinks: []

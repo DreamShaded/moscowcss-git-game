@@ -1,0 +1,51 @@
+id: H2
+title: "Rerere против повторяющегося конфликта"
+difficulty: hard
+points: 7
+maxCommands: 8
+
+inGame:
+  story: |
+    refactor/css-architecture живёт месяц. Каждую неделю мержишь main,
+    и каждый раз одни и те же 12 конфликтов в theme.css.
+  goal: "Настроить rerere, сделать первый merge с запоминанием."
+  bank:
+    commands: [config, merge, add, commit]
+    flags: ["--global", "rerere.enabled", "true"]
+    args: ["theme.css", "main"]
+    decoys:
+      - "git config merge.tool"
+      - "git merge -X ours"
+      - "git merge -X theirs"
+    prebuilt:
+      - "git config --global rerere.enabled true"
+      - "git merge main"
+      - "git add theme.css"
+      - "git commit"
+
+  validSolutions:
+    - kind: ideal
+      label: "config + merge + add + commit"
+      sequence:
+        - step: "git config --global rerere.enabled true"
+        - step: "git merge main"
+        - step: "git add theme.css"
+        - step: "git commit"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesFlag, flag: "--global" }
+        points: 1
+        reason: "глобально — для всех репо"
+    penalties: []
+
+  hints:
+    - "rerere = REuse REcorded REsolution."
+
+knowledge:
+  explanation: |
+    rerere запоминает resolved-конфликты и применяет автоматически при повторе.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [rerere-internals, rerere-forget]
+  externalLinks: []

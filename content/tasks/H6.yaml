@@ -1,0 +1,45 @@
+id: H6
+title: "Submodule застрял в detached HEAD"
+difficulty: hard
+points: 7
+maxCommands: 5
+
+inGame:
+  story: |
+    Дизайн-токены в submodule. Кто-то закоммитил новый pointer,
+    но эта версия есть только локально у Леры. CI падает.
+  goal: "Откатить pointer сабмодуля на предыдущий валидный hash."
+  bank:
+    commands: [submodule, checkout, commit]
+    flags: ["update", "--init", "--recursive", "-m"]
+    args: ["design-tokens", "HEAD~1", '"fix: rollback design-tokens pointer"']
+    decoys:
+      - "git submodule update --remote"
+      - "git revert HEAD"
+    prebuilt:
+      - "git checkout HEAD~1 -- design-tokens"
+      - "git submodule update --init --recursive"
+      - 'git commit -m "fix: rollback design-tokens pointer"'
+
+  validSolutions:
+    - kind: ideal
+      label: "checkout pointer + submodule update + commit"
+      sequence:
+        - step: "git checkout HEAD~1 -- design-tokens"
+        - step: "git submodule update --init --recursive"
+        - step: 'git commit -m "fix: rollback design-tokens pointer"'
+
+  forbiddenCommands:
+    - "git submodule update --remote"
+
+  hints:
+    - "Pointer сабмодуля — это просто gitlink в дереве parent-коммита."
+
+knowledge:
+  explanation: |
+    submodule update --init --recursive подтягивает локальный checkout под pointer.
+    --remote меняет pointer сам — это часто не то, что нужно.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [submodule-pointer-mechanics, submodule-remote-flag]
+  externalLinks: []

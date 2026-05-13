@@ -1,0 +1,55 @@
+id: M3
+title: "Squash трёх коммитов"
+difficulty: medium
+points: 3
+maxCommands: 6
+
+inGame:
+  story: |
+    Три коммита: "wip", "wip 2", "finally works".
+    Марк требует один осмысленный коммит перед PR.
+  goal: "Схлопнуть три коммита в один с нормальным сообщением."
+  bank:
+    commands: [rebase, reset, commit]
+    flags: ["-i", "--soft", "-m"]
+    args: ["HEAD~3", '"feat: implement button variants"']
+    decoys:
+      - "git merge --squash"
+      - "git commit --amend"
+      - "git reset --hard HEAD~3"
+    prebuilt:
+      - "git reset --soft HEAD~3"
+      - 'git commit -m "feat: implement button variants"'
+      - "git rebase -i HEAD~3"
+
+  validSolutions:
+    - kind: ideal
+      label: "reset --soft + commit"
+      sequence:
+        - step: "git reset --soft HEAD~3"
+        - step: 'git commit -m "feat: implement button variants"'
+    - kind: standard
+      label: "interactive rebase"
+      sequence:
+        - step: "git rebase -i HEAD~3"
+          acceptableVariants:
+            - "git rebase -i HEAD~3"
+            - "git rebase --interactive HEAD~3"
+
+  forbiddenCommands: []
+  hints:
+    - "reset --soft переводит коммиты в индекс одной командой."
+    - "interactive rebase даёт больше контроля, но длиннее."
+
+knowledge:
+  explanation: |
+    reset --soft HEAD~3 убирает три верхних коммита, но оставляет их изменения staged.
+    Дальше — обычный commit. Альтернатива — rebase -i с пометкой squash/fixup.
+  solutionsCommentary:
+    - solutionLabel: "reset --soft + commit"
+      commentary: "Самый короткий путь полного squash."
+  aliases:
+    - { from: "git rebase -i HEAD~3 (для полного squash)", to: "git reset --soft HEAD~3 && git commit", note: "Короче, если задача — схлопнуть всё в один." }
+  relatedKnowledge: [rebase-interactive-actions, commit-fixup-flow]
+  externalLinks:
+    - { title: "git-rebase(1)", url: "https://git-scm.com/docs/git-rebase" }

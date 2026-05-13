@@ -1,0 +1,64 @@
+id: M5
+title: "Reflog спасает после reset --hard"
+difficulty: medium
+points: 3
+maxCommands: 4
+
+inGame:
+  story: |
+    Соня сделала git reset --hard HEAD~5, потеряла 5 коммитов работы над модалкой.
+    Не пушила. Плачет.
+  goal: "Восстановить ветку на потерянный коммит."
+  bank:
+    commands: [reflog, reset, branch]
+    flags: ["--hard"]
+    args: ["ORIG_HEAD", "HEAD@{1}", "deadbee", "recovery"]
+    decoys:
+      - "git pull"
+      - "git revert"
+      - "git fsck --lost-found"
+    prebuilt:
+      - "git reset --hard ORIG_HEAD"
+      - "git reset --hard HEAD@{1}"
+      - "git reflog"
+      - "git reset --hard deadbee"
+      - "git branch recovery deadbee"
+
+  validSolutions:
+    - kind: ideal
+      label: "reset --hard ORIG_HEAD"
+      sequence:
+        - step: "git reset --hard ORIG_HEAD"
+    - kind: standard
+      label: "reflog + reset"
+      sequence:
+        - step: "git reflog"
+        - step: "git reset --hard deadbee"
+    - kind: long
+      label: "safer recovery branch"
+      sequence:
+        - step: "git reflog"
+        - step: "git branch recovery deadbee"
+        - step: "git reset --hard deadbee"
+
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesArg, arg: "ORIG_HEAD" }
+        points: 1
+        reason: "ORIG_HEAD — короткий путь"
+    penalties: []
+
+  hints:
+    - "ORIG_HEAD автоматически выставляется перед опасными операциями."
+    - "reflog показывает все позиции HEAD."
+
+knowledge:
+  explanation: |
+    reset --hard выставляет ORIG_HEAD на предыдущий HEAD. reflog хранит историю позиций.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [reflog-mechanics, orig-head-when-set, gc-and-pruning]
+  externalLinks:
+    - { title: "git-reflog(1)", url: "https://git-scm.com/docs/git-reflog" }

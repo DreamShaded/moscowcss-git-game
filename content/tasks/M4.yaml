@@ -1,0 +1,50 @@
+id: M4
+title: "Revert запушенного коммита"
+difficulty: medium
+points: 3
+maxCommands: 3
+
+inGame:
+  story: |
+    Соня запушила в main коммит (hash bad1234), ломающий сборку Storybook.
+    История запулена всеми.
+  goal: "Отменить эффект коммита, не переписывая историю."
+  bank:
+    commands: [revert, reset, push]
+    flags: ["--hard", "--force", "--force-with-lease", "--no-edit"]
+    args: ["bad1234", "HEAD~1", "origin", "main"]
+    decoys:
+      - "git reset --hard HEAD~1"
+      - "git push --force"
+    prebuilt:
+      - "git revert bad1234"
+      - "git revert --no-edit bad1234"
+      - "git push"
+
+  validSolutions:
+    - kind: ideal
+      label: "revert + push"
+      sequence:
+        - step: "git revert bad1234"
+        - step: "git push"
+    - kind: standard
+      label: "revert --no-edit + push"
+      sequence:
+        - step: "git revert --no-edit bad1234"
+        - step: "git push"
+
+  forbiddenCommands:
+    - "git reset --hard HEAD~1"
+    - "git push --force"
+
+  hints:
+    - "revert создаёт новый коммит-инверсию. Push без force — история не переписывается."
+
+knowledge:
+  explanation: |
+    Shared-история ≠ право на rewrite. revert безопасен для пушенных коммитов.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [revert-vs-reset, revert-merge-commits]
+  externalLinks:
+    - { title: "git-revert(1)", url: "https://git-scm.com/docs/git-revert" }

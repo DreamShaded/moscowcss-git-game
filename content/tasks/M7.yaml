@@ -1,0 +1,47 @@
+id: M7
+title: "Подтянуть main без merge-коммита"
+difficulty: medium
+points: 3
+maxCommands: 3
+
+inGame:
+  story: |
+    Неделю сидишь в feature/grid-system. main ушла на 40 коммитов.
+    Марк ненавидит merge-коммиты в feature-ветках.
+  goal: "Подтянуть изменения, оставив линейную историю."
+  bank:
+    commands: [fetch, rebase, pull, merge]
+    flags: ["--rebase"]
+    args: ["origin", "origin/main", "main"]
+    decoys:
+      - "git merge main"
+      - "git reset --hard origin/main"
+    prebuilt:
+      - "git fetch origin"
+      - "git rebase origin/main"
+      - "git pull --rebase origin main"
+
+  validSolutions:
+    - kind: ideal
+      label: "fetch + rebase"
+      sequence:
+        - step: "git fetch origin"
+        - step: "git rebase origin/main"
+    - kind: standard
+      label: "pull --rebase"
+      sequence:
+        - step: "git pull --rebase origin main"
+
+  forbiddenCommands:
+    - "git reset --hard origin/main"
+
+  hints:
+    - "rebase даёт линейную историю."
+
+knowledge:
+  explanation: |
+    pull.rebase=true делает rebase поведением по умолчанию.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [pull-rebase-config, linear-history-philosophy]
+  externalLinks: []

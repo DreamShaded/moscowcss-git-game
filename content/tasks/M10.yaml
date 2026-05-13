@@ -1,0 +1,52 @@
+id: M10
+title: "ORIG_HEAD после неудачного rebase"
+difficulty: medium
+points: 3
+maxCommands: 2
+
+inGame:
+  story: |
+    Сделал git rebase main на feature/forms, история сломалась.
+    Решил половину конфликтов, потом понял что подход неверный.
+    --abort уже не вариант (коммит посередине).
+  goal: "Вернуть ветку в pre-rebase позицию."
+  bank:
+    commands: [reset, reflog]
+    flags: ["--hard"]
+    args: ["ORIG_HEAD", "HEAD@{1}", "abc123"]
+    decoys:
+      - "git rebase --abort"
+    prebuilt:
+      - "git reset --hard ORIG_HEAD"
+      - "git reset --hard HEAD@{1}"
+      - "git reflog"
+      - "git reset --hard abc123"
+
+  validSolutions:
+    - kind: ideal
+      label: "reset ORIG_HEAD"
+      sequence:
+        - step: "git reset --hard ORIG_HEAD"
+    - kind: standard
+      label: "reflog + reset"
+      sequence:
+        - step: "git reflog"
+        - step: "git reset --hard abc123"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesArg, arg: "ORIG_HEAD" }
+        points: 2
+        reason: "ORIG_HEAD — знание короткого пути"
+    penalties: []
+
+  hints:
+    - "rebase выставляет ORIG_HEAD на pre-rebase позицию."
+
+knowledge:
+  explanation: |
+    ORIG_HEAD выставляется reset, merge, rebase, pull перед опасной операцией.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [orig-head-when-set, rebase-recovery]
+  externalLinks: []

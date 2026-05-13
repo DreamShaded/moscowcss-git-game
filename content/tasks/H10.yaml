@@ -1,0 +1,49 @@
+id: H10
+title: "Восстановить через ORIG_HEAD сразу после reset"
+difficulty: hard
+points: 7
+maxCommands: 1
+
+inGame:
+  story: |
+    Сделал git reset --hard HEAD~10, ошибся веткой. Других операций не было.
+    10 коммитов исчезли.
+  goal: "Вернуть ветку одной командой."
+  bank:
+    commands: [reset]
+    flags: ["--hard"]
+    args: ["ORIG_HEAD", "HEAD@{1}"]
+    decoys:
+      - "git reflog"
+      - "git revert"
+    prebuilt:
+      - "git reset --hard ORIG_HEAD"
+      - "git reset --hard HEAD@{1}"
+
+  validSolutions:
+    - kind: ideal
+      label: "reset --hard ORIG_HEAD"
+      sequence:
+        - step: "git reset --hard ORIG_HEAD"
+    - kind: standard
+      label: "reset --hard HEAD@{1}"
+      sequence:
+        - step: "git reset --hard HEAD@{1}"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesArg, arg: "ORIG_HEAD" }
+        points: 2
+        reason: "ORIG_HEAD — минимальный путь"
+    penalties: []
+
+  hints:
+    - "ORIG_HEAD автоматически выставляется reset/merge/rebase."
+
+knowledge:
+  explanation: |
+    Внутри maxCommands=1 единственно реальный путь — ORIG_HEAD или HEAD@{1}.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [automatic-refs, orig-head-when-set, head-history-syntax]
+  externalLinks: []

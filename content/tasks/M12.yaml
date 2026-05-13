@@ -1,0 +1,40 @@
+id: M12
+title: "Запушить ветку под другим именем"
+difficulty: medium
+points: 3
+maxCommands: 2
+
+inGame:
+  story: |
+    Локально wip-experiment, на remote должна быть feature/experiment-x.
+  goal: "На remote feature/experiment-x. Локально wip-experiment."
+  bank:
+    commands: [push]
+    flags: ["-u"]
+    args: ["origin", "wip-experiment:feature/experiment-x"]
+    decoys:
+      - "git branch -m"
+    prebuilt:
+      - "git push origin wip-experiment:feature/experiment-x"
+      - "git push -u origin wip-experiment:feature/experiment-x"
+
+  validSolutions:
+    - kind: ideal
+      label: "push refspec"
+      sequence:
+        - step: "git push origin wip-experiment:feature/experiment-x"
+    - kind: standard
+      label: "push -u refspec"
+      sequence:
+        - step: "git push -u origin wip-experiment:feature/experiment-x"
+
+  hints:
+    - "Refspec в push: <local>:<remote>."
+
+knowledge:
+  explanation: |
+    push <remote> <local>:<remote_branch> — отправляет под произвольным именем.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [push-refspec, triangular-workflows]
+  externalLinks: []

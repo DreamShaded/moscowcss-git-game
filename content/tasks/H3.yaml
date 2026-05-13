@@ -1,0 +1,40 @@
+id: H3
+title: "Worktree для параллельной работы"
+difficulty: hard
+points: 7
+maxCommands: 6
+
+inGame:
+  story: |
+    На середине рефакторинга в feature/grid, полтора дня незакоммиченной работы.
+    Прилетает hotfix. Stash страшно.
+  goal: "Открыть параллельную копию для hotfix/safari-flex от main, убрать worktree."
+  bank:
+    commands: [worktree]
+    flags: ["add", "remove", "-b"]
+    args: ["../cascadia-hotfix", "hotfix/safari-flex", "main"]
+    decoys:
+      - "git stash"
+      - "git clone"
+      - "git switch -c"
+    prebuilt:
+      - "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main"
+      - "git worktree remove ../cascadia-hotfix"
+
+  validSolutions:
+    - kind: ideal
+      label: "worktree add + remove"
+      sequence:
+        - step: "git worktree add ../cascadia-hotfix -b hotfix/safari-flex main"
+        - step: "git worktree remove ../cascadia-hotfix"
+
+  hints:
+    - "worktree даёт второй checkout того же репо в другой директории."
+
+knowledge:
+  explanation: |
+    worktree — несколько рабочих копий одного .git. Каждая ветка может быть checked out в своём worktree.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [worktree-mechanics, worktree-vs-clone]
+  externalLinks: []

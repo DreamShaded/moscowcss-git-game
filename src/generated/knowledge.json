@@ -1,0 +1,292 @@
+{
+  "abort-vs-reset": {
+    "title": "abort vs reset",
+    "html": "<h1>abort vs reset</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# abort vs reset\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "add-patch-mechanics": {
+    "title": "add patch mechanics",
+    "html": "<h1>add patch mechanics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# add patch mechanics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "aliases-and-shortcuts": {
+    "title": "aliases and shortcuts",
+    "html": "<h1>aliases and shortcuts</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# aliases and shortcuts\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "amend-after-push": {
+    "title": "amend after push",
+    "html": "<h1>amend after push</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# amend after push\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "amend-pitfalls": {
+    "title": "amend pitfalls",
+    "html": "<h1>amend pitfalls</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# amend pitfalls\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "automatic-refs": {
+    "title": "automatic refs",
+    "html": "<h1>automatic refs</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# automatic refs\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "bfg-alternative": {
+    "title": "bfg alternative",
+    "html": "<h1>bfg alternative</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# bfg alternative\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "bisect-mechanics": {
+    "title": "bisect mechanics",
+    "html": "<h1>bisect mechanics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# bisect mechanics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "bisect-run-exit-codes": {
+    "title": "bisect run exit codes",
+    "html": "<h1>bisect run exit codes</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# bisect run exit codes\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "branch-contains": {
+    "title": "branch contains",
+    "html": "<h1>branch contains</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# branch contains\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "branch-move-mechanics": {
+    "title": "branch move mechanics",
+    "html": "<h1>branch move mechanics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# branch move mechanics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "branch-pointer-semantics": {
+    "title": "branch pointer semantics",
+    "html": "<h1>branch pointer semantics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# branch pointer semantics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "cherry-pick-merge-commits": {
+    "title": "cherry pick merge commits",
+    "html": "<h1>cherry pick merge commits</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# cherry pick merge commits\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "cherry-pick-range": {
+    "title": "cherry pick range",
+    "html": "<h1>cherry pick range</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# cherry pick range\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "cherry-pick-ranges": {
+    "title": "cherry pick ranges",
+    "html": "<h1>cherry pick ranges</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# cherry pick ranges\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "cherry-tool": {
+    "title": "cherry tool",
+    "html": "<h1>cherry tool</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# cherry tool\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "commit-fixup-autosquash": {
+    "title": "commit fixup autosquash",
+    "html": "<h1>commit fixup autosquash</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# commit fixup autosquash\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "commit-fixup-flow": {
+    "title": "commit fixup flow",
+    "html": "<h1>commit fixup flow</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# commit fixup flow\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "config-power-ups": {
+    "title": "config power ups",
+    "html": "<h1>config power ups</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# config power ups\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "filter-repo-vs-branch": {
+    "title": "filter repo vs branch",
+    "html": "<h1>filter repo vs branch</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# filter repo vs branch\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "force-with-lease-vs-force": {
+    "title": "force with lease vs force",
+    "html": "<h1>force with lease vs force</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# force with lease vs force\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "fsck-dangling": {
+    "title": "fsck dangling",
+    "html": "<h1>fsck dangling</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# fsck dangling\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "gc-and-pruning": {
+    "title": "gc and pruning",
+    "html": "<h1>gc and pruning</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# gc and pruning\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "gc-timing": {
+    "title": "gc timing",
+    "html": "<h1>gc timing</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# gc timing\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "git-show-paths": {
+    "title": "git show paths",
+    "html": "<h1>git show paths</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# git show paths\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "head-history-syntax": {
+    "title": "head history syntax",
+    "html": "<h1>head history syntax</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# head history syntax\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "linear-history-philosophy": {
+    "title": "linear history philosophy",
+    "html": "<h1>linear history philosophy</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# linear history philosophy\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "log-L-function-history": {
+    "title": "log L function history",
+    "html": "<h1>log L function history</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# log L function history\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "merge-state-files": {
+    "title": "merge state files",
+    "html": "<h1>merge state files</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# merge state files\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "orig-head-when-set": {
+    "title": "orig head when set",
+    "html": "<h1>orig head when set</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# orig head when set\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "pickaxe-vs-grep": {
+    "title": "pickaxe vs grep",
+    "html": "<h1>pickaxe vs grep</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# pickaxe vs grep\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "post-rewrite-protocol": {
+    "title": "post rewrite protocol",
+    "html": "<h1>post rewrite protocol</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# post rewrite protocol\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "post-rewrite-team-protocol": {
+    "title": "post rewrite team protocol",
+    "html": "<h1>post rewrite team protocol</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# post rewrite team protocol\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "pull-rebase-config": {
+    "title": "pull rebase config",
+    "html": "<h1>pull rebase config</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# pull rebase config\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "push-autosetup": {
+    "title": "push autosetup",
+    "html": "<h1>push autosetup</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# push autosetup\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "push-refspec": {
+    "title": "push refspec",
+    "html": "<h1>push refspec</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# push refspec\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "rebase-interactive-actions": {
+    "title": "rebase interactive actions",
+    "html": "<h1>rebase interactive actions</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# rebase interactive actions\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "rebase-onto-deep": {
+    "title": "rebase onto deep",
+    "html": "<h1>rebase onto deep</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# rebase onto deep\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "rebase-recovery": {
+    "title": "rebase recovery",
+    "html": "<h1>rebase recovery</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# rebase recovery\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "reflog-deep": {
+    "title": "reflog deep",
+    "html": "<h1>reflog deep</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# reflog deep\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "reflog-mechanics": {
+    "title": "reflog mechanics",
+    "html": "<h1>reflog mechanics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# reflog mechanics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "rerere-forget": {
+    "title": "rerere forget",
+    "html": "<h1>rerere forget</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# rerere forget\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "rerere-internals": {
+    "title": "rerere internals",
+    "html": "<h1>rerere internals</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# rerere internals\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "reset-soft-mixed-hard": {
+    "title": "reset soft mixed hard",
+    "html": "<h1>reset soft mixed hard</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# reset soft mixed hard\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "restore-vs-checkout": {
+    "title": "restore vs checkout",
+    "html": "<h1>restore vs checkout</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# restore vs checkout\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "revert-merge-commits": {
+    "title": "revert merge commits",
+    "html": "<h1>revert merge commits</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# revert merge commits\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "revert-vs-reset": {
+    "title": "revert vs reset",
+    "html": "<h1>revert vs reset</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# revert vs reset\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "revision-syntax-deep": {
+    "title": "revision syntax deep",
+    "html": "<h1>revision syntax deep</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# revision syntax deep\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "revision-syntax": {
+    "title": "revision syntax",
+    "html": "<h1>revision syntax</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# revision syntax\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "stash-advanced": {
+    "title": "stash advanced",
+    "html": "<h1>stash advanced</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# stash advanced\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "stash-patch": {
+    "title": "stash patch",
+    "html": "<h1>stash patch</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# stash patch\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "submodule-pointer-mechanics": {
+    "title": "submodule pointer mechanics",
+    "html": "<h1>submodule pointer mechanics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# submodule pointer mechanics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "submodule-remote-flag": {
+    "title": "submodule remote flag",
+    "html": "<h1>submodule remote flag</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# submodule remote flag\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "switch-dash-aliases": {
+    "title": "switch dash aliases",
+    "html": "<h1>switch dash aliases</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# switch dash aliases\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "switch-vs-checkout": {
+    "title": "switch vs checkout",
+    "html": "<h1>switch vs checkout</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# switch vs checkout\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "triangular-workflows": {
+    "title": "triangular workflows",
+    "html": "<h1>triangular workflows</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# triangular workflows\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "worktree-mechanics": {
+    "title": "worktree mechanics",
+    "html": "<h1>worktree mechanics</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# worktree mechanics\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  },
+  "worktree-vs-clone": {
+    "title": "worktree vs clone",
+    "html": "<h1>worktree vs clone</h1>\n<p><em>Заглушка-страница базы знаний. Расширяется по мере наполнения.</em></p>\n",
+    "source": "# worktree vs clone\n\n_Заглушка-страница базы знаний. Расширяется по мере наполнения._\n"
+  }
+}

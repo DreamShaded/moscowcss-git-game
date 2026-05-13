@@ -1,0 +1,46 @@
+id: L3
+title: "Опечатка в сообщении коммита"
+difficulty: easy
+points: 1
+maxCommands: 3
+
+inGame:
+  story: |
+    Закоммитил "fix buton hover state". Не пушил. Марк всё ещё смотрит.
+  goal: "Исправить сообщение последнего коммита."
+  bank:
+    commands: [commit, rebase, reset]
+    flags: ["--amend", "--soft", "-i", "-m"]
+    args: ['"fix button hover state"', "HEAD~1"]
+    decoys:
+      - "git rebase -i HEAD~1"
+    prebuilt:
+      - 'git commit --amend -m "fix button hover state"'
+      - "git reset --soft HEAD~1"
+      - 'git commit -m "fix button hover state"'
+
+  validSolutions:
+    - kind: ideal
+      label: "amend одной командой"
+      sequence:
+        - step: 'git commit --amend -m "fix button hover state"'
+    - kind: long
+      label: "reset --soft + новый коммит"
+      sequence:
+        - step: "git reset --soft HEAD~1"
+        - step: 'git commit -m "fix button hover state"'
+
+  forbiddenCommands: []
+  hints:
+    - "Есть команда специально для исправления последнего коммита."
+
+knowledge:
+  explanation: |
+    git commit --amend заменяет HEAD-коммит. После push требует --force-with-lease.
+  solutionsCommentary:
+    - solutionLabel: "amend одной командой"
+      commentary: "Самый короткий путь."
+  aliases: []
+  relatedKnowledge: [amend-after-push, commit-fixup-autosquash]
+  externalLinks:
+    - { title: "git-commit(1)", url: "https://git-scm.com/docs/git-commit" }

@@ -1,0 +1,102 @@
+id: L1
+title: "Stash перед пожаром"
+difficulty: easy
+points: 1
+maxCommands: 7
+
+inGame:
+  story: |
+    Ты переписываешь Button.module.css, ничего не закоммичено.
+    Прилетает срочный hotfix в main — у клиента в проде белый текст на белом фоне.
+  goal: "Уйти на main, починить (один коммит), вернуться, продолжить работу."
+
+  initialStateDisplay:
+    branchLabel: "feature/button"
+    commits:
+      - { hash: c1, message: "init button styles" }
+    workingTree: "dirty: Button.module.css"
+
+  bank:
+    commands: [stash, switch, commit, add, pop]
+    flags: [-m, -am]
+    args: ["main", "-", "feature/button", '"fix: white-on-white"']
+    decoys:
+      - "git stash drop"
+      - "git checkout -- ."
+      - "git reset --hard"
+      - "git clean -fd"
+    prebuilt:
+      - "git stash"
+      - "git stash pop"
+      - "git switch main"
+      - "git switch -"
+      - "git switch feature/button"
+      - 'git commit -am "fix: white-on-white"'
+      - "git add ."
+      - 'git commit -m "wip"'
+      - "git reset HEAD~1"
+
+  validSolutions:
+    - kind: ideal
+      label: "stash + switch - + pop"
+      sequence:
+        - step: "git stash"
+        - step: "git switch main"
+        - step: 'git commit -am "fix: white-on-white"'
+        - step: "git switch -"
+          acceptableVariants: ["git switch -", "git switch feature/button"]
+        - step: "git stash pop"
+
+    - kind: standard
+      label: "stash + явный switch + pop"
+      sequence:
+        - step: "git stash"
+        - step: "git switch main"
+        - step: 'git commit -am "fix: white-on-white"'
+        - step: "git switch feature/button"
+        - step: "git stash pop"
+
+    - kind: long
+      label: "wip-коммит вместо stash"
+      sequence:
+        - step: "git add ."
+        - step: 'git commit -m "wip"'
+        - step: "git switch main"
+        - step: 'git commit -am "fix: white-on-white"'
+        - step: "git switch feature/button"
+        - step: "git reset HEAD~1"
+
+  forbiddenCommands:
+    - "git reset --hard"
+    - "git clean -fd"
+
+  pointsModifiers:
+    bonuses: []
+    penalties: []
+
+  hints:
+    - "Незакоммиченные изменения можно временно отложить, не делая коммит."
+    - "После работы в другой ветке отложенное можно вернуть."
+
+knowledge:
+  explanation: |
+    Stash — side-стек для временной заморозки worktree+index.
+    Используется, когда нужно срочно переключиться, а wip-коммит делать не хочется.
+  solutionsCommentary:
+    - solutionLabel: "stash + switch - + pop"
+      commentary: |
+        Короткая форма: switch - возвращает на предыдущую ветку без указания имени.
+    - solutionLabel: "stash + явный switch + pop"
+      commentary: |
+        То же самое, но с явным именем ветки — типичное middle-решение.
+    - solutionLabel: "wip-коммит вместо stash"
+      commentary: |
+        Длиннее и грязнее: создаёт мусорный коммит, потом его откатывает.
+  aliases:
+    - from: "git switch -"
+      to: "git checkout -"
+      note: "Старая форма, эквивалентна"
+  relatedKnowledge: [stash-advanced, switch-vs-checkout]
+  externalLinks:
+    - { title: "git-stash(1)", url: "https://git-scm.com/docs/git-stash" }
+    - { title: "git-switch(1)", url: "https://git-scm.com/docs/git-switch" }

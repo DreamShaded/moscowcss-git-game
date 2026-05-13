@@ -1,0 +1,61 @@
+id: H1
+title: "Bisect охотится на сломанный :hover"
+difficulty: hard
+points: 7
+maxCommands: 8
+
+inGame:
+  story: |
+    За 50 коммитов кто-то сломал :hover в Safari. CI зелёный, e2e не покрывает hover.
+    Скрипт npm run test:hover возвращает 0/1.
+  goal: "Найти ломающий коммит автоматически, откатить, выйти из bisect."
+  bank:
+    commands: [bisect, revert]
+    flags: ["start", "good", "bad", "run", "reset"]
+    args: ["HEAD", "v1.0.0", "npm run test:hover", "found123"]
+    decoys:
+      - "git blame"
+      - "git log -S"
+    prebuilt:
+      - "git bisect start"
+      - "git bisect bad HEAD"
+      - "git bisect good v1.0.0"
+      - "git bisect run npm run test:hover"
+      - "git bisect reset"
+      - "git revert found123"
+
+  validSolutions:
+    - kind: ideal
+      label: "bisect run"
+      sequence:
+        - step: "git bisect start"
+        - step: "git bisect bad HEAD"
+        - step: "git bisect good v1.0.0"
+        - step: "git bisect run npm run test:hover"
+        - step: "git bisect reset"
+        - step: "git revert found123"
+
+  forbiddenCommands: []
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesFlag, flag: "run" }
+        points: 2
+        reason: "автоматизация через bisect run"
+    penalties:
+      - condition: { type: avoidsCommand, command: "git bisect reset" }
+        points: -1
+        reason: "не вышел из bisect"
+
+  hints:
+    - "bisect run автоматизирует binary search через exit code."
+    - "Не забыть bisect reset перед revert."
+
+knowledge:
+  explanation: |
+    bisect run <cmd>: 0 = good, 1-127 (кроме 125) = bad, 125 = skip.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [bisect-mechanics, bisect-run-exit-codes]
+  externalLinks:
+    - { title: "git-bisect(1)", url: "https://git-scm.com/docs/git-bisect" }

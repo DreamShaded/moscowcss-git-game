@@ -1,0 +1,41 @@
+id: H9
+title: "Найти куда уехал коммит"
+difficulty: hard
+points: 7
+maxCommands: 3
+
+inGame:
+  story: |
+    Hash коммита-фикса fix555 должен быть в release/3.1, release/3.2, release/3.3.
+  goal: "Список веток с коммитом."
+  bank:
+    commands: [branch]
+    flags: ["--contains", "-a"]
+    args: ["fix555"]
+    decoys:
+      - "git log fix555.."
+      - "git cherry"
+    prebuilt:
+      - "git branch --contains fix555"
+      - "git branch -a --contains fix555"
+
+  validSolutions:
+    - kind: ideal
+      label: "branch -a --contains"
+      sequence:
+        - step: "git branch -a --contains fix555"
+    - kind: standard
+      label: "branch --contains"
+      sequence:
+        - step: "git branch --contains fix555"
+
+  hints:
+    - "branch --contains <hash> покажет ветки с коммитом."
+
+knowledge:
+  explanation: |
+    --contains <commitish>: ветки, у которых коммит — предок HEAD.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [branch-contains, cherry-tool]
+  externalLinks: []

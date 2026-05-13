@@ -1,0 +1,41 @@
+id: H5
+title: "Восстановление удалённой ветки"
+difficulty: hard
+points: 7
+maxCommands: 5
+
+inGame:
+  story: |
+    Соня сделала git branch -D feature/animations локально и git push origin --delete.
+    2 недели работы. Никто другой не пуллил.
+  goal: "Восстановить ветку локально и на remote."
+  bank:
+    commands: [reflog, branch, push]
+    flags: ["-u"]
+    args: ["lost123", "feature/animations", "origin"]
+    decoys:
+      - "git clone"
+      - "git pull"
+    prebuilt:
+      - "git reflog"
+      - "git branch feature/animations lost123"
+      - "git push -u origin feature/animations"
+
+  validSolutions:
+    - kind: ideal
+      label: "reflog + branch + push"
+      sequence:
+        - step: "git reflog"
+        - step: "git branch feature/animations lost123"
+        - step: "git push -u origin feature/animations"
+
+  hints:
+    - "reflog показывает HEAD-историю, даже когда ветка удалена."
+
+knowledge:
+  explanation: |
+    Удалённая ветка живёт в reflog до gc.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [reflog-deep, fsck-dangling, gc-timing]
+  externalLinks: []

@@ -1,0 +1,70 @@
+id: M1
+title: "Cherry-pick хотфикса"
+difficulty: medium
+points: 3
+maxCommands: 4
+
+inGame:
+  story: |
+    В main запушен срочный фикс :focus-visible (hash a1b2c3d).
+    В feature/forms он нужен сейчас. Мержить main целиком нельзя.
+  goal: "Перенести один коммит из main в текущую ветку, разрешить конфликт."
+  bank:
+    commands: [cherry-pick, add, merge, rebase, commit]
+    flags: ["--continue", "--abort", "-n", "-x", "-m"]
+    args: ["a1b2c3d", "main", "src/components/forms.css", '"chore: focus-visible"']
+    decoys:
+      - "git merge main"
+      - "git rebase main"
+      - "git cherry-pick --abort"
+    prebuilt:
+      - "git cherry-pick a1b2c3d"
+      - "git cherry-pick -x a1b2c3d"
+      - "git cherry-pick -n a1b2c3d"
+      - "git add src/components/forms.css"
+      - "git cherry-pick --continue"
+      - 'git commit -m "chore: focus-visible"'
+
+  validSolutions:
+    - kind: ideal
+      label: "cherry-pick -x + resolve + continue"
+      sequence:
+        - step: "git cherry-pick -x a1b2c3d"
+        - step: "git add src/components/forms.css"
+        - step: "git cherry-pick --continue"
+    - kind: standard
+      label: "cherry-pick + continue"
+      sequence:
+        - step: "git cherry-pick a1b2c3d"
+        - step: "git add src/components/forms.css"
+        - step: "git cherry-pick --continue"
+    - kind: long
+      label: "cherry-pick -n + ручной commit"
+      sequence:
+        - step: "git cherry-pick -n a1b2c3d"
+        - step: "git add src/components/forms.css"
+        - step: 'git commit -m "chore: focus-visible"'
+
+  forbiddenCommands:
+    - "git merge main"
+    - "git rebase main"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesFlag, flag: "-x" }
+        points: 1
+        reason: "-x записывает исходный hash в сообщение"
+    penalties: []
+
+  hints:
+    - "cherry-pick переносит коммит по хэшу. Конфликты решаются как в обычном merge: add + --continue."
+
+knowledge:
+  explanation: |
+    cherry-pick переносит конкретный коммит в текущую ветку. Флаг -x добавляет в сообщение
+    ссылку на оригинальный коммит — полезно для аудита.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [cherry-pick-ranges, cherry-pick-merge-commits]
+  externalLinks:
+    - { title: "git-cherry-pick(1)", url: "https://git-scm.com/docs/git-cherry-pick" }

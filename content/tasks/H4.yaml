@@ -1,0 +1,52 @@
+id: H4
+title: "Filter-repo: вычистить случайный .env"
+difficulty: hard
+points: 7
+maxCommands: 5
+
+inGame:
+  story: |
+    Витя 3 месяца назад закоммитил .env с production-ключами.
+    Прошёл через 200+ коммитов. Команда оповещена, окно для force-push согласовано.
+  goal: "Удалить файл из всей истории, force-push на remote."
+  bank:
+    commands: [filter-repo, push]
+    flags: ["--path", "--invert-paths", "--force", "--all", "--tags"]
+    args: [".env", "origin"]
+    decoys:
+      - "git rm .env"
+      - "git reset"
+    prebuilt:
+      - "git filter-repo --path .env --invert-paths"
+      - "git push --force --all"
+      - "git push --force --tags"
+
+  validSolutions:
+    - kind: ideal
+      label: "filter-repo + push all/tags"
+      sequence:
+        - step: "git filter-repo --path .env --invert-paths"
+        - step: "git push --force --all"
+        - step: "git push --force --tags"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesCommand, command: "git filter-repo" }
+        points: 1
+        reason: "filter-repo (рекомендован git над filter-branch)"
+      - condition: { type: usesFlag, flag: "--tags" }
+        points: 1
+        reason: "не забыл теги"
+    penalties: []
+
+  hints:
+    - "filter-repo заменил filter-branch."
+    - "Не забыть пушнуть теги — они отдельно."
+
+knowledge:
+  explanation: |
+    git-filter-repo — внешний, но рекомендованный инструмент для переписывания истории.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [filter-repo-vs-branch, bfg-alternative, post-rewrite-protocol]
+  externalLinks: []

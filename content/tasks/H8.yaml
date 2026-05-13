@@ -1,0 +1,44 @@
+id: H8
+title: "Извлечь серию коммитов через --onto"
+difficulty: hard
+points: 7
+maxCommands: 4
+
+inGame:
+  story: |
+    feature/forms по ошибке ответвилась от feature/buttons вместо main.
+    Последние 4 коммита — твои, чистые.
+  goal: "feature/forms начинается от main и содержит только твои 4 коммита."
+  bank:
+    commands: [rebase]
+    flags: ["--onto"]
+    args: ["main", "feature/buttons", "feature/forms"]
+    decoys:
+      - "git rebase main"
+      - "git reset --hard main"
+    prebuilt:
+      - "git rebase --onto main feature/buttons feature/forms"
+
+  validSolutions:
+    - kind: ideal
+      label: "rebase --onto"
+      sequence:
+        - step: "git rebase --onto main feature/buttons feature/forms"
+
+  pointsModifiers:
+    bonuses:
+      - condition: { type: usesFlag, flag: "--onto" }
+        points: 2
+        reason: "--onto — элегантный перенос диапазона"
+    penalties: []
+
+  hints:
+    - "--onto <new> <old> <branch>: перенести коммиты с <old>..<branch> поверх <new>."
+
+knowledge:
+  explanation: |
+    rebase --onto переносит произвольный диапазон поверх произвольной базы.
+  solutionsCommentary: []
+  aliases: []
+  relatedKnowledge: [rebase-onto-deep, cherry-pick-range]
+  externalLinks: []
